@@ -379,3 +379,57 @@ tr:hover {
     padding: 1rem;
   }
 }
+/* Add these styles to the end of your globals.css file */
+
+/* Mobile Filter Improvements */
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  .filter-group select {
+    width: 100%;
+    min-width: unset;
+  }
+  
+  /* Stack stats grid vertically on mobile */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  /* Improve table scrolling on mobile */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better mobile navigation */
+  .nav-menu {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .nav-item {
+    padding: 0.75rem 1rem;
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  /* Mobile typography adjustments */
+  h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+}
