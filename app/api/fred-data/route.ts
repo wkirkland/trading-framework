@@ -12,18 +12,24 @@ export async function GET() {
     const fredData = await fredService.getBulkData(seriesIds);
     
     // Transform the data to match our metric names
-    const transformedData: Record<string, any> = {};
-    
-    Object.entries(METRIC_TO_FRED_MAPPING).forEach(([metricName, seriesId]) => {
-      const data = fredData[seriesId];
-      transformedData[metricName] = {
-        value: data.value,
-        formatted: data.formatted,
-        date: data.date,
-        change: data.change,
-        lastUpdated: new Date().toISOString()
-      };
-    });
+    const transformedData: Record<string, {
+        value: number | null;
+        formatted: string;
+        date: string;
+        change?: number;
+        lastUpdated: string;
+      }> = {};
+      
+      Object.entries(METRIC_TO_FRED_MAPPING).forEach(([metricName, seriesId]) => {
+        const data = fredData[seriesId];
+        transformedData[metricName] = {
+          value: data.value,
+          formatted: data.formatted || 'N/A', // Handle undefined formatted value
+          date: data.date || '',               // Handle undefined date
+          change: data.change,
+          lastUpdated: new Date().toISOString()
+        };
+      });
 
     return NextResponse.json({
       success: true,

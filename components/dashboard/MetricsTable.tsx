@@ -10,7 +10,7 @@ export function MetricsTable() {
   const [timingFilter, setTimingFilter] = useState<string>('all');
   const [frequencyFilter, setFrequencyFilter] = useState<string>('all');
 
-  const { liveData, loading, error, lastFetched, fetchData, getLiveValue, getChangeIndicator, getChangeColor } = useLiveData();
+  const { loading, error, lastFetched, fetchData, getLiveValue, getChangeIndicator, getChangeColor } = useLiveData();
 
   const filteredMetrics = useMemo(() => {
     return metricsData.filter(metric => {
