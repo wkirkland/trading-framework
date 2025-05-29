@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { metricsData, type Metric } from '@/lib/data/metrics';
+import { metricsData } from '@/lib/data/metrics';
 
 export function MetricsTable() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
