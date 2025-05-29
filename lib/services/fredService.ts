@@ -19,7 +19,7 @@ interface FredDataPoint {
   // FRED Series IDs for key economic indicators
   export const FRED_SERIES = {
     // GDP and Growth
-    GDP_GROWTH: 'GDPC1', // Real GDP
+    GDP_GROWTH: 'A191RL1Q225SBEA', // Real GDP Growth Rate (quarterly, annualized %)
     GDP_NOW: 'GDPNOW', // GDPNow (if available, otherwise use quarterly GDP)
     
     // Employment
@@ -145,7 +145,7 @@ interface FredDataPoint {
       if (isNaN(value)) return 'N/A';
   
       // Rates and percentages
-      if (seriesId.includes('RATE') || seriesId.includes('UNRATE') || seriesId.includes('FEDFUNDS') || seriesId.includes('GS')) {
+      if (seriesId.includes('RATE') || seriesId.includes('UNRATE') || seriesId.includes('FEDFUNDS') || seriesId.includes('GS') || seriesId.includes('A191RL1Q225SBEA')) {
         return `${value.toFixed(2)}%`;
       }
   
