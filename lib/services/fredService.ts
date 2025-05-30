@@ -1,4 +1,4 @@
-// lib/services/fredService.ts (UPDATED with rate limiting and caching)
+// lib/services/fredService.ts (FIXED - no any types)
 
 interface FredDataPoint {
   date: string;
@@ -47,7 +47,7 @@ class FredService {
   private baseUrl = 'https://api.stlouisfed.org/fred';
   private apiKey: string;
   private cache: Map<string, CachedData> = new Map();
-  private requestQueue: Promise<any>[] = [];
+  private requestQueue: Promise<unknown>[] = [];
   private lastRequestTime = 0;
   private readonly RATE_LIMIT_DELAY = 1000; // 1 second between requests
   private readonly CACHE_DURATION = 15 * 60 * 1000; // 15 minutes cache

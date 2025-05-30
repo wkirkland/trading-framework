@@ -1,4 +1,4 @@
-// lib/hooks/useEnhancedSignalAnalysis.ts
+// lib/hooks/useEnhancedSignalAnalysis.ts (FIXED - no dependency issues)
 
 import { useState, useMemo } from 'react';
 import { useLiveData } from './useLiveData';
@@ -112,7 +112,7 @@ const getNextUpdateEstimate = (metricName: string): string => {
 };
 
 export function useEnhancedSignalAnalysis() {
-  const { liveData, loading, error, lastFetched, fetchData, getLiveValue } = useLiveData();
+  const { loading, error, lastFetched, fetchData, getLiveValue } = useLiveData();
   const [selectedThesis, setSelectedThesis] = useState<string>('economic-transition');
 
   // Extract market data from your live data system
@@ -123,7 +123,7 @@ export function useEnhancedSignalAnalysis() {
       dollarIndex: getLiveValue('Dollar Index')?.value || null,
       gold: getLiveValue('Gold Price')?.value || null
     };
-  }, [liveData, getLiveValue]);
+  }, [getLiveValue]);
 
   // Calculate enhanced evidence scores with market indicators
   const evidenceScores = useMemo((): EvidenceScores => {
@@ -136,7 +136,7 @@ export function useEnhancedSignalAnalysis() {
     let economicScore = 0;
     let economicWeight = 0;
 
-            Object.entries(rules.economic).forEach(([metricName, rule]) => {
+    Object.entries(rules.economic).forEach(([metricName, rule]) => {
       const liveValue = getLiveValue(metricName);
       if (liveValue?.value !== null && liveValue?.value !== undefined) {
         const value = liveValue.value;
@@ -248,7 +248,7 @@ export function useEnhancedSignalAnalysis() {
       market: normalizedMarket,
       overall
     };
-  }, [selectedThesis, liveData, marketData, getLiveValue]);
+  }, [selectedThesis, marketData, getLiveValue]);
 
   // Enhanced key metrics including market indicators
   const keyMetrics = useMemo((): SignalData[] => {
@@ -346,10 +346,10 @@ export function useEnhancedSignalAnalysis() {
               if (value !== null) {
                 if (selectedThesis === 'soft-landing') {
                   signal = value <= rule.threshold.negative ? 'confirm' : value >= rule.threshold.positive ? 'contradict' : 'neutral';
-                  reasoning = `Gold at ${value.toFixed(0)} ${signal === 'confirm' ? 'shows low uncertainty' : signal === 'contradict' ? 'shows high uncertainty' : 'is neutral'}`;
+                  reasoning = `Gold at $${value.toFixed(0)} ${signal === 'confirm' ? 'shows low uncertainty' : signal === 'contradict' ? 'shows high uncertainty' : 'is neutral'}`;
                 } else {
                   signal = value >= rule.threshold.positive ? 'confirm' : value <= rule.threshold.negative ? 'contradict' : 'neutral';
-                  reasoning = `Gold at ${value.toFixed(0)} ${signal === 'confirm' ? 'shows safe haven demand' : signal === 'contradict' ? 'shows low uncertainty' : 'is neutral'}`;
+                  reasoning = `Gold at $${value.toFixed(0)} ${signal === 'confirm' ? 'shows safe haven demand' : signal === 'contradict' ? 'shows low uncertainty' : 'is neutral'}`;
                 }
               }
               break;
@@ -371,7 +371,7 @@ export function useEnhancedSignalAnalysis() {
     }
 
     return metrics;
-  }, [selectedThesis, liveData, marketData, getLiveValue]);
+  }, [selectedThesis, marketData, getLiveValue]);
 
   // Enhanced conflict alerts with market-based conflicts
   const conflictAlerts = useMemo((): ConflictAlert[] => {
@@ -425,7 +425,7 @@ export function useEnhancedSignalAnalysis() {
         alerts.push({
           title: 'Dollar-Gold Conflict',
           severity: 'MEDIUM',
-          description: `Strong dollar (${dollarValue.value.toFixed(1)}) typically pressures gold, but gold remains elevated at ${goldValue.value.toFixed(0)} - suggests underlying uncertainty`,
+          description: `Strong dollar (${dollarValue.value.toFixed(1)}) typically pressures gold, but gold remains elevated at $${goldValue.value.toFixed(0)} - suggests underlying uncertainty`,
           isActive: true,
           marketBased: true
         });
@@ -433,7 +433,7 @@ export function useEnhancedSignalAnalysis() {
     }
 
     return alerts;
-  }, [liveData, getLiveValue]);
+  }, [getLiveValue]);
 
   // Enhanced threshold triggers
   const thresholdTriggers = useMemo((): ThresholdTrigger[] => {
@@ -494,7 +494,7 @@ export function useEnhancedSignalAnalysis() {
     });
 
     return triggers;
-  }, [liveData, getLiveValue]);
+  }, [getLiveValue]);
 
   return {
     selectedThesis,

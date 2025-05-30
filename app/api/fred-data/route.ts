@@ -1,11 +1,30 @@
-// app/api/fred-data/route.ts (ENHANCED with debugging)
+// app/api/fred-data/route.ts (FIXED - resolved type mismatch)
 
 import { NextResponse } from 'next/server';
 import { fredService, METRIC_TO_FRED_MAPPING } from '@/lib/services/fredService';
 import { multiSourceDataService } from '@/lib/services/multiSourceDataService';
 
+interface DebugInfo {
+  fredStatus: string;
+  alphaVantageStatus: string;
+  errors: string[];
+  apiKeys: {
+    fredPresent: boolean;
+    alphaVantagePresent: boolean;
+    fredKeyLength: number;
+    alphaVantageKeyLength: number;
+  };
+  timestamp: string;
+  fredFetchTime?: number;
+  alphaVantageFetchTime?: number;
+  cacheStats?: {
+    fredCache: { size: number; keys: string[] };
+    marketCache: { size: number; keys: string[] };
+  };
+}
+
 export async function GET() {
-  const debugInfo: any = {
+  const debugInfo: DebugInfo = {
     fredStatus: 'unknown',
     alphaVantageStatus: 'unknown',
     errors: [],
@@ -141,19 +160,46 @@ export async function GET() {
   }
 }
 
+// Debug endpoint types - FIXED: Made formatted optional to match MetricValue
+interface TestResult {
+  success: boolean;
+  result?: {
+    value: number | null;
+    formatted?: string; // FIXED: Made optional to match MetricValue
+    date: string;
+    change?: number;
+    source?: string;
+  };
+  error?: string;
+  cached?: boolean;
+  isFlack?: boolean;
+}
+
+interface EnvironmentTest {
+  fredKey: string;
+  alphaKey: string;
+  nodeEnv: string;
+}
+
+interface TestResults {
+  fredTest: TestResult | null;
+  alphaVantageTest: TestResult | null;
+  environmentTest: EnvironmentTest;
+}
+
 // Add a separate debug endpoint
 export async function POST() {
   try {
     console.log('🔍 Debug endpoint called');
     
     // Test individual API calls
-    const tests = {
-      fredTest: null as any,
-      alphaVantageTest: null as any,
+    const tests: TestResults = {
+      fredTest: null,
+      alphaVantageTest: null,
       environmentTest: {
         fredKey: process.env.FRED_API_KEY ? `${process.env.FRED_API_KEY.substring(0, 8)}...` : 'MISSING',
         alphaKey: process.env.ALPHA_VANTAGE_API_KEY ? `${process.env.ALPHA_VANTAGE_API_KEY.substring(0, 8)}...` : 'MISSING',
-        nodeEnv: process.env.NODE_ENV
+        nodeEnv: process.env.NODE_ENV || 'unknown'
       }
     };
 
@@ -163,7 +209,13 @@ export async function POST() {
       const fredTestResult = await fredService.getLatestValue('UNRATE');
       tests.fredTest = {
         success: true,
-        result: fredTestResult,
+        result: {
+          value: fredTestResult.value,
+          formatted: fredTestResult.formatted || 'N/A', // FIXED: Handle undefined formatted
+          date: fredTestResult.date,
+          change: fredTestResult.change,
+          source: 'source' in fredTestResult ? (fredTestResult.source as string) : 'FRED'
+        },
         cached: fredTestResult.formatted === 'N/A' ? false : true
       };
       console.log('✅ FRED test result:', fredTestResult);
@@ -181,8 +233,14 @@ export async function POST() {
       const alphaTestResult = await multiSourceDataService.getVIX();
       tests.alphaVantageTest = {
         success: true,
-        result: alphaTestResult,
-        isFlack: alphaTestResult.source === 'Fallback Data'
+        result: {
+          value: alphaTestResult.value,
+          formatted: alphaTestResult.formatted || 'N/A', // FIXED: Handle undefined formatted
+          date: alphaTestResult.date,
+          change: alphaTestResult.change,
+          source: 'source' in alphaTestResult ? alphaTestResult.source : 'Alpha Vantage'
+        },
+        isFlack: 'source' in alphaTestResult && alphaTestResult.source === 'Fallback Data'
       };
       console.log('✅ Alpha Vantage test result:', alphaTestResult);
     } catch (error) {

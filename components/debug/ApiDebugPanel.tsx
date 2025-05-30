@@ -1,15 +1,65 @@
-// components/debug/ApiDebugPanel.tsx
+// components/debug/ApiDebugPanel.tsx (FIXED - no any types)
 
 'use client';
 
 import { useState } from 'react';
 
+interface TestResult {
+  success: boolean;
+  result?: {
+    value: number | null;
+    formatted: string;
+    date: string;
+    change?: number;
+    source?: string;
+  };
+  error?: string;
+  cached?: boolean;
+  isFlack?: boolean;
+}
+
+interface EnvironmentTest {
+  fredKey: string;
+  alphaKey: string;
+  nodeEnv: string;
+}
+
+interface TestResults {
+  fredTest: TestResult | null;
+  alphaVantageTest: TestResult | null;
+  environmentTest: EnvironmentTest;
+}
+
+interface CacheStats {
+  fred: { size: number; keys: string[] };
+  market: { size: number; keys: string[] };
+}
+
+interface DebugInfo {
+  fredStatus: string;
+  alphaVantageStatus: string;
+  errors: string[];
+  apiKeys: {
+    fredPresent: boolean;
+    alphaVantagePresent: boolean;
+    fredKeyLength: number;
+    alphaVantageKeyLength: number;
+  };
+  timestamp: string;
+  fredFetchTime?: number;
+  alphaVantageFetchTime?: number;
+  cacheStats?: {
+    fredCache: { size: number; keys: string[] };
+    marketCache: { size: number; keys: string[] };
+  };
+}
+
 interface ApiDebugData {
   success: boolean;
   timestamp: string;
-  tests?: any;
-  cacheStats?: any;
-  debug?: any;
+  tests?: TestResults;
+  cacheStats?: CacheStats;
+  debug?: DebugInfo;
   error?: string;
 }
 
