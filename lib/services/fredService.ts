@@ -34,7 +34,7 @@ export const FRED_SERIES = {
   // Manufacturing & Production
   INDUSTRIAL_PRODUCTION: 'INDPRO',
   CAPACITY_UTILIZATION: 'TCU', // Total Capacity Utilization
-  MANUFACTURING_PMI: 'NAPM', // ISM Manufacturing PMI (may be discontinued)
+  //MANUFACTURING_PMI: 'NAPM', // ISM Manufacturing PMI (may be discontinued) discontinued
   SERVICES_PMI: 'NAPM', // Services PMI - may need different series
   
   // Inflation - Complete Set
@@ -421,7 +421,7 @@ export const METRIC_TO_FRED_MAPPING = {
   // Manufacturing & Production
   'Industrial Production Index': FRED_SERIES.INDUSTRIAL_PRODUCTION,
   'Capacity Utilization Rate': FRED_SERIES.CAPACITY_UTILIZATION,
-  'Manufacturing PMI': FRED_SERIES.MANUFACTURING_PMI,
+  //'Manufacturing PMI': FRED_SERIES.MANUFACTURING_PMI, discontinued?
   
   // Inflation - Complete Set
   'Core CPI': FRED_SERIES.CORE_CPI,
