@@ -1,6 +1,6 @@
-// lib/hooks/useSignalAnalysis.ts
+// lib/hooks/useSignalAnalysis.ts (FIXED for deployment)
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useLiveData } from './useLiveData';
 
 interface SignalData {
@@ -83,7 +83,7 @@ const THESIS_SCORING_RULES = {
 };
 
 export function useSignalAnalysis() {
-  const { liveData, loading, error, lastFetched, fetchData, getLiveValue } = useLiveData();
+  const { loading, error, lastFetched, fetchData, getLiveValue } = useLiveData();
   const [selectedThesis, setSelectedThesis] = useState<string>('economic-transition');
 
   // Calculate evidence scores based on real data
@@ -137,7 +137,7 @@ export function useSignalAnalysis() {
       environmental,
       overall
     };
-  }, [selectedThesis, liveData, getLiveValue]);
+  }, [selectedThesis, getLiveValue]);
 
   // Generate key metrics with real signal analysis
   const keyMetrics = useMemo((): SignalData[] => {
@@ -180,7 +180,7 @@ export function useSignalAnalysis() {
     }
 
     return metrics;
-  }, [selectedThesis, liveData, getLiveValue]);
+  }, [selectedThesis, getLiveValue]);
 
   // Generate conflict alerts based on real data
   const conflictAlerts = useMemo((): ConflictAlert[] => {
@@ -223,7 +223,7 @@ export function useSignalAnalysis() {
     }
 
     return alerts;
-  }, [liveData, getLiveValue]);
+  }, [getLiveValue]);
 
   // Generate threshold triggers
   const thresholdTriggers = useMemo((): ThresholdTrigger[] => {
@@ -256,7 +256,7 @@ export function useSignalAnalysis() {
     });
 
     return triggers;
-  }, [liveData, getLiveValue]);
+  }, [getLiveValue]);
 
   return {
     selectedThesis,

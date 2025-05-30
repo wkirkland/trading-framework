@@ -1,3 +1,4 @@
+// components/layout/Navigation.tsx (updated)
 'use client';
 
 import Link from 'next/link';
@@ -9,7 +10,8 @@ export default function Navigation() {
   const navItems = [
     { href: '/', label: 'Home', description: 'Trading Framework Overview' },
     { href: '/module1', label: 'Module 1', description: 'Macro Environment Assessment' },
-    { href: '/signal-dashboard', label: 'Signal Dashboard', description: 'Conflict Analysis' },
+    { href: '/signal-dashboard', label: 'Signal Dashboard', description: 'Basic Conflict Analysis' },
+    { href: '/enhanced-dashboard', label: 'Enhanced Dashboard', description: 'Market + Economic Signals' }, // NEW
   ];
 
   const isActive = (href: string) => {
@@ -38,7 +40,10 @@ export default function Navigation() {
               href={item.href}
               className={`nav-item ${isActive(item.href) ? 'active' : ''}`}
             >
-              <div className="nav-item-title">{item.label}</div>
+              <div className="nav-item-title">
+                {item.href === '/enhanced-dashboard' && '🔥 '}
+                {item.label}
+              </div>
               <div className="nav-item-desc">{item.description}</div>
             </Link>
           ))}
