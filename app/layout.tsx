@@ -1,28 +1,28 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-import Navigation from '@/components/layout/Navigation'
+// app/layout.tsx (UPDATED to wrap with DataProvider)
 
-const inter = Inter({ subsets: ['latin'] })
+import './globals.css';
+import type { Metadata } from 'next';
+import Navigation from '@/components/layout/Navigation';
+import { DataProvider } from '@/lib/context/DataContext';
 
 export const metadata: Metadata = {
-  title: 'Trading Framework - Systematic Market Analysis',
-  description: 'Comprehensive macro environment assessment and signal conflict analysis for systematic trading decisions',
-}
+  title: 'Trading Framework',
+  description: 'Systematic trading framework with live market analysis',
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Navigation />
-        <main>
+      <body>
+        <DataProvider>
+          <Navigation />
           {children}
-        </main>
+        </DataProvider>
       </body>
     </html>
-  )
+  );
 }

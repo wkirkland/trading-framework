@@ -1,151 +1,129 @@
-import Link from 'next/link';
+// app/page.tsx (your home page with debug panel added)
 
-export default function Home() {
+import { ApiDebugPanel } from '@/components/debug/ApiDebugPanel';
+
+export default function HomePage() {
   return (
     <div className="page-container">
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {/* Hero Section */}
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h1 style={{ fontSize: '3.5rem', marginBottom: '1.5rem' }}>
-            Trading Framework
-          </h1>
-          <p style={{ fontSize: '1.3rem', color: '#6b7280', marginBottom: '2rem', maxWidth: '800px', margin: '0 auto 2rem auto' }}>
-            A systematic, nine-module approach to market analysis that eliminates emotional decision-making 
-            and transforms trading into a disciplined, repeatable process.
+      <div className="card">
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h1>Trading Framework</h1>
+          <p className="subtitle">
+            Systematic Market Analysis & Signal Detection Platform
           </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/module1" className="btn btn-primary">
-              Explore Module 1
-            </Link>
-            <Link href="/signal-dashboard" className="btn btn-secondary">
-              Signal Dashboard
-            </Link>
+        </div>
+
+        {/* Overview Grid */}
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-number">9</div>
+            <div className="stat-label">Analysis Modules</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">100+</div>
+            <div className="stat-label">Economic Indicators</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">4</div>
+            <div className="stat-label">Market Indicators</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">Real-time</div>
+            <div className="stat-label">Live Data Feeds</div>
           </div>
         </div>
 
         {/* Framework Overview */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '3rem', marginBottom: '4rem' }}>
-          <div>
-            <h2>The Framework</h2>
-            <p style={{ fontSize: '1.1rem', lineHeight: '1.7', marginBottom: '1.5rem' }}>
-              Our systematic approach combines multiple analytical dimensions to create robust investment decisions. 
-              Each module builds upon the previous, ensuring comprehensive analysis before any trade execution.
-            </p>
-            <ul style={{ listStyle: 'none', padding: 0, fontSize: '1rem', color: '#6b7280' }}>
-              <li style={{ display: 'flex', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <div style={{ width: '8px', height: '8px', background: '#3b82f6', borderRadius: '50%', marginRight: '0.75rem' }}></div>
-                Macro Environment Assessment
-              </li>
-              <li style={{ display: 'flex', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <div style={{ width: '8px', height: '8px', background: '#8b5cf6', borderRadius: '50%', marginRight: '0.75rem' }}></div>
-                Market Regime Identification
-              </li>
-              <li style={{ display: 'flex', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <div style={{ width: '8px', height: '8px', background: '#10b981', borderRadius: '50%', marginRight: '0.75rem' }}></div>
-                Sentiment & Positioning Analysis
-              </li>
-              <li style={{ display: 'flex', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <div style={{ width: '8px', height: '8px', background: '#f59e0b', borderRadius: '50%', marginRight: '0.75rem' }}></div>
-                And 6 additional systematic modules...
-              </li>
-            </ul>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div className="card" style={{ padding: '1.5rem' }}>
-              <h3 style={{ marginBottom: '1rem' }}>Key Benefits</h3>
-              <ul style={{ listStyle: 'none', padding: 0, color: '#6b7280' }}>
-                <li style={{ marginBottom: '0.5rem' }}>• Eliminates emotional decision-making</li>
-                <li style={{ marginBottom: '0.5rem' }}>• Provides systematic risk management</li>
-                <li style={{ marginBottom: '0.5rem' }}>• Creates repeatable, measurable results</li>
-                <li style={{ marginBottom: '0.5rem' }}>• Adapts to changing market conditions</li>
-              </ul>
+        <div style={{ marginBottom: '2rem' }}>
+          <h2>Framework Modules</h2>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ 
+              background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', 
+              color: 'white', 
+              padding: '1.5rem', 
+              borderRadius: '1rem' 
+            }}>
+              <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.2rem' }}>Module 1: Macro Environment</h3>
+              <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.9 }}>
+                Comprehensive economic, political, social & environmental metrics assessment
+              </p>
             </div>
-
-            <div className="card" style={{ padding: '1.5rem' }}>
-              <h3 style={{ marginBottom: '1rem' }}>Current Status</h3>
-              <ul style={{ listStyle: 'none', padding: 0, color: '#6b7280' }}>
-                <li style={{ marginBottom: '0.5rem' }}>• Module 1: Comprehensive metrics dashboard</li>
-                <li style={{ marginBottom: '0.5rem' }}>• Signal conflict detection system</li>
-                <li style={{ marginBottom: '0.5rem' }}>• Real-time thesis alignment tracking</li>
-                <li style={{ marginBottom: '0.5rem' }}>• Performance attribution framework</li>
-              </ul>
+            
+            <div style={{ 
+              background: 'linear-gradient(135deg, #10b981, #059669)', 
+              color: 'white', 
+              padding: '1.5rem', 
+              borderRadius: '1rem' 
+            }}>
+              <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.2rem' }}>Signal Dashboard</h3>
+              <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.9 }}>
+                Real-time conflict detection and thesis validation with live economic data
+              </p>
+            </div>
+            
+            <div style={{ 
+              background: 'linear-gradient(135deg, #f59e0b, #d97706)', 
+              color: 'white', 
+              padding: '1.5rem', 
+              borderRadius: '1rem' 
+            }}>
+              <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.2rem' }}>🔥 Enhanced Dashboard</h3>
+              <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.9 }}>
+                Advanced analysis combining economic data with real-time market indicators
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Module Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
-          <Link href="/module1" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div className="card" style={{ padding: '2rem', transition: 'all 0.2s', cursor: 'pointer' }}>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                <div style={{ 
-                  width: '3rem', 
-                  height: '3rem', 
-                  background: 'linear-gradient(135deg, #3b82f6, #2563eb)', 
-                  borderRadius: '0.5rem', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  marginRight: '1rem' 
-                }}>
-                  <span style={{ color: 'white', fontWeight: 'bold', fontSize: '1.2rem' }}>1</span>
-                </div>
-                <h3>Module 1</h3>
-              </div>
-              <h4 style={{ fontSize: '1.3rem', fontWeight: '500', color: '#1f2937', marginBottom: '0.75rem' }}>
-                Macro Environment Assessment
-              </h4>
-              <p style={{ marginBottom: '1rem' }}>
-                Comprehensive tracking of 100+ economic, political, social, and environmental metrics 
-                with interactive filtering and real-time analysis.
-              </p>
-              <div style={{ display: 'flex', alignItems: 'center', color: '#3b82f6', fontWeight: '500' }}>
-                Explore Dashboard
-                <span style={{ marginLeft: '0.5rem' }}>→</span>
-              </div>
-            </div>
-          </Link>
-
-          <Link href="/signal-dashboard" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div className="card" style={{ padding: '2rem', transition: 'all 0.2s', cursor: 'pointer' }}>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                <div style={{ 
-                  width: '3rem', 
-                  height: '3rem', 
-                  background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', 
-                  borderRadius: '0.5rem', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  marginRight: '1rem' 
-                }}>
-                  <span style={{ color: 'white', fontWeight: 'bold', fontSize: '1.2rem' }}>⚡</span>
-                </div>
-                <h3>Signal Dashboard</h3>
-              </div>
-              <h4 style={{ fontSize: '1.3rem', fontWeight: '500', color: '#1f2937', marginBottom: '0.75rem' }}>
-                Conflict Analysis System
-              </h4>
-              <p style={{ marginBottom: '1rem' }}>
-                Real-time tracking of reinforcing vs. contradicting signals with thesis alignment 
-                analysis and threshold-based trigger alerts.
-              </p>
-              <div style={{ display: 'flex', alignItems: 'center', color: '#8b5cf6', fontWeight: '500' }}>
-                View Conflicts
-                <span style={{ marginLeft: '0.5rem' }}>→</span>
-              </div>
-            </div>
-          </Link>
+        {/* Navigation Links */}
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <a href="/module1" className="btn btn-primary">
+            Explore Module 1
+          </a>
+          <a href="/signal-dashboard" className="btn btn-secondary">
+            View Signal Dashboard
+          </a>
+          <a href="/enhanced-dashboard" className="btn btn-primary">
+            🔥 Enhanced Dashboard
+          </a>
         </div>
 
-        {/* Footer */}
-        <div style={{ textAlign: 'center', marginTop: '4rem', paddingTop: '2rem', borderTop: '1px solid #e5e7eb' }}>
-          <p style={{ color: '#6b7280' }}>
-            Built with systematic precision for disciplined trading decisions
+        {/* Project Description */}
+        <div style={{ marginTop: '3rem', padding: '2rem', background: '#f8fafc', borderRadius: '1rem' }}>
+          <h3>About This Framework</h3>
+          <p>
+            This systematic trading framework transforms market analysis from art to science through a 
+            structured nine-module approach. Each module builds upon previous insights to create 
+            comprehensive, data-driven investment decisions.
           </p>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginTop: '1.5rem' }}>
+            <div>
+              <h4 style={{ color: '#3b82f6', marginBottom: '0.5rem' }}>📊 Live Data Integration</h4>
+              <p style={{ fontSize: '0.9rem', margin: 0 }}>
+                Real-time feeds from FRED Economic Data and Alpha Vantage market data
+              </p>
+            </div>
+            <div>
+              <h4 style={{ color: '#10b981', marginBottom: '0.5rem' }}>🎯 Signal Conflict Detection</h4>
+              <p style={{ fontSize: '0.9rem', margin: 0 }}>
+                Automated detection of contradictions between economic and market signals
+              </p>
+            </div>
+            <div>
+              <h4 style={{ color: '#f59e0b', marginBottom: '0.5rem' }}>⚖️ Evidence-Based Scoring</h4>
+              <p style={{ fontSize: '0.9rem', margin: 0 }}>
+                Quantitative scoring across multiple dimensions for systematic decision-making
+              </p>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Debug Panel - Add this for debugging */}
+      <ApiDebugPanel />
     </div>
   );
 }
