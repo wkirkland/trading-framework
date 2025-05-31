@@ -1,7 +1,12 @@
 // lib/hooks/useSignalAnalysis.ts (FIXED for deployment)
 
 import { useState, useMemo } from 'react';
-import { useLiveData } from './useLiveData';
+import { useLiveData } from '@/lib/context/DataContext';
+import { THESIS_SCORING_RULES } from '@/lib/config/signalThesisRules';
+import { calculateBasicEvidenceScores } from '@/lib/utils/analysisUtils';
+import { BasicEvidenceScores } from '@/lib/utils/analysisUtils';
+
+
 
 interface SignalData {
   name: string;
@@ -11,14 +16,6 @@ interface SignalData {
   nextUpdate: string;
   value?: number | null;
   reasoning?: string;
-}
-
-interface EvidenceScores {
-  economic: number;
-  political: number;
-  social: number;
-  environmental: number;
-  overall: number;
 }
 
 interface ConflictAlert {
@@ -51,93 +48,18 @@ const getNextUpdateEstimate = (metricName: string): string => {
   return 'Quarterly';
 };
 
-// Thesis scoring logic based on real economic conditions
-const THESIS_SCORING_RULES = {
-  'economic-transition': {
-    economic: {
-      'Real GDP Growth Rate': { weight: 0.3, threshold: { negative: -1, positive: 2 } },
-      'Unemployment Rate (U-3)': { weight: 0.25, threshold: { negative: 4.5, positive: 3.5 } },
-      'Core PCE': { weight: 0.2, threshold: { negative: 3.5, positive: 2.0 } },
-      'Fed Funds Rate': { weight: 0.15, threshold: { negative: 3.0, positive: 5.5 } },
-      'Consumer Confidence Index': { weight: 0.1, threshold: { negative: 90, positive: 110 } }
-    }
-  },
-  'soft-landing': {
-    economic: {
-      'Real GDP Growth Rate': { weight: 0.25, threshold: { negative: 0, positive: 3 } },
-      'Unemployment Rate (U-3)': { weight: 0.25, threshold: { negative: 5, positive: 3 } },
-      'Core PCE': { weight: 0.25, threshold: { negative: 4, positive: 1.5 } },
-      'Fed Funds Rate': { weight: 0.15, threshold: { negative: 6, positive: 2 } },
-      'Consumer Confidence Index': { weight: 0.1, threshold: { negative: 85, positive: 105 } }
-    }
-  },
-  'mild-recession': {
-    economic: {
-      'Real GDP Growth Rate': { weight: 0.3, threshold: { negative: 1, positive: -2 } },
-      'Unemployment Rate (U-3)': { weight: 0.25, threshold: { negative: 3.5, positive: 6 } },
-      'Core PCE': { weight: 0.2, threshold: { negative: 2, positive: 4 } },
-      'Initial Jobless Claims': { weight: 0.15, threshold: { negative: 300, positive: 450 } },
-      'Consumer Confidence Index': { weight: 0.1, threshold: { negative: 100, positive: 70 } }
-    }
-  }
-};
 
 export function useSignalAnalysis() {
   const { loading, error, lastFetched, fetchData, getLiveValue } = useLiveData();
   const [selectedThesis, setSelectedThesis] = useState<string>('economic-transition');
 
-  // Calculate evidence scores based on real data
-  const evidenceScores = useMemo((): EvidenceScores => {
-    const rules = THESIS_SCORING_RULES[selectedThesis as keyof typeof THESIS_SCORING_RULES];
-    if (!rules) {
-      return { economic: 0, political: 0, social: 0, environmental: 0, overall: 0 };
-    }
-
-    let economicScore = 0;
-    let totalWeight = 0;
-
-    // Calculate economic score based on real data
-    Object.entries(rules.economic).forEach(([metricName, rule]) => {
-      const liveValue = getLiveValue(metricName);
-      if (liveValue?.value !== null && liveValue?.value !== undefined) {
-        const value = liveValue.value;
-        let score = 0;
-
-        // Score based on thresholds
-        if (value <= rule.threshold.positive) {
-          score = 2; // Strong positive
-        } else if (value <= (rule.threshold.positive + rule.threshold.negative) / 2) {
-          score = 1; // Mild positive
-        } else if (value <= rule.threshold.negative) {
-          score = -1; // Mild negative
-        } else {
-          score = -2; // Strong negative
-        }
-
-        economicScore += score * rule.weight;
-        totalWeight += rule.weight;
-      }
-    });
-
-    // Normalize economic score
-    const normalizedEconomic = totalWeight > 0 ? economicScore / totalWeight : 0;
-
-    // For now, political/social/environmental are placeholder
-    // You could expand these with more data sources
-    const political = normalizedEconomic * 0.3; // Correlated but weaker
-    const social = normalizedEconomic * 0.2;
-    const environmental = 0; // Neutral for now
-
-    const overall = (normalizedEconomic + political + social + environmental) / 4;
-
-    return {
-      economic: normalizedEconomic,
-      political,
-      social,
-      environmental,
-      overall
-    };
-  }, [selectedThesis, getLiveValue]);
+  const evidenceScores = useMemo((): BasicEvidenceScores => { // Use the imported BasicEvidenceScores type
+    return calculateBasicEvidenceScores(
+      selectedThesis,
+      THESIS_SCORING_RULES, // These are the basic rules imported from signalThesisRules.ts
+      getLiveValue
+    );
+  }, [selectedThesis, getLiveValue]); // Dependencies for the new call
 
   // Generate key metrics with real signal analysis
   const keyMetrics = useMemo((): SignalData[] => {

@@ -1,6 +1,6 @@
-// lib/hooks/useLiveData.ts
-
-import { useState, useEffect } from 'react';
+/*
+// lib/hooks/useLiveDataSingleton.ts
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface LiveMetricData {
   value: number | null;
@@ -17,50 +17,138 @@ interface LiveDataResponse {
   error?: string;
 }
 
-export function useLiveData() {
-  const [liveData, setLiveData] = useState<Record<string, LiveMetricData>>({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [lastFetched, setLastFetched] = useState<Date | null>(null);
+// Global state manager (singleton pattern)
+class LiveDataManager {
+  private data: Record<string, LiveMetricData> = {};
+  private loading = false;
+  private error: string | null = null;
+  private lastFetched: Date | null = null;
+  private subscribers = new Set<() => void>();
+  private intervalId: NodeJS.Timeout | null = null;
+  private initialized = false;
 
-  const fetchData = async () => {
-    setLoading(true);
-    setError(null);
+  // Subscribe a component to data updates
+  subscribe(callback: () => void) {
+    console.log(`📡 Component subscribed. Total subscribers: ${this.subscribers.size + 1}`);
+    this.subscribers.add(callback);
+    
+    // Initialize on first subscription
+    if (!this.initialized) {
+      this.initialize();
+    }
+    
+    // Return unsubscribe function
+    return () => {
+      console.log(`📡 Component unsubscribed. Total subscribers: ${this.subscribers.size - 1}`);
+      this.subscribers.delete(callback);
+      
+      // Clean up if no more subscribers
+      if (this.subscribers.size === 0) {
+        this.cleanup();
+      }
+    };
+  }
+
+  private initialize() {
+    console.log('🚀 LiveDataManager: Initializing...');
+    this.initialized = true;
+    
+    // Initial fetch
+    this.fetchData();
+    
+    // Set up interval
+    this.intervalId = setInterval(() => {
+      console.log('⏰ LiveDataManager: Auto-refresh triggered');
+      this.fetchData();
+    }, 5 * 60 * 1000); // 5 minutes
+  }
+
+  private cleanup() {
+    console.log('🧹 LiveDataManager: Cleaning up...');
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+    this.initialized = false;
+  }
+
+  private notifySubscribers() {
+    this.subscribers.forEach(callback => callback());
+  }
+
+  private async fetchData() {
+    console.log('🔄 LiveDataManager: Fetching data...', new Date().toISOString());
+    
+    this.loading = true;
+    this.error = null;
+    this.notifySubscribers();
     
     try {
       const response = await fetch('/api/fred-data');
       const result: LiveDataResponse = await response.json();
       
       if (result.success) {
-        setLiveData(result.data);
-        setLastFetched(new Date());
+        this.data = result.data;
+        this.lastFetched = new Date();
+        console.log('✅ LiveDataManager: Data updated successfully');
       } else {
-        setError(result.error || 'Failed to fetch data');
+        this.error = result.error || 'Failed to fetch data';
+        console.error('❌ LiveDataManager: API returned error:', result.error);
       }
     } catch (err) {
-      setError('Network error - using cached data');
-      console.error('Error fetching live data:', err);
+      this.error = 'Network error - using cached data';
+      console.error('❌ LiveDataManager: Network error:', err);
     } finally {
-      setLoading(false);
+      this.loading = false;
+      this.notifySubscribers();
     }
-  };
+  }
 
-  // Fetch data on mount
-  useEffect(() => {
-    fetchData();
+  // Public getters
+  getData() { return this.data; }
+  getLoading() { return this.loading; }
+  getError() { return this.error; }
+  getLastFetched() { return this.lastFetched; }
+  
+  // Manual refresh
+  refresh() {
+    console.log('🔄 LiveDataManager: Manual refresh requested');
+    this.fetchData();
+  }
+}
+
+// Global instance
+const liveDataManager = new LiveDataManager();
+
+// React hook that uses the global manager
+export function useLiveData() {
+  const [, forceUpdate] = useState({});
+  const mountedRef = useRef(true);
+
+  // Force re-render when data changes
+  const triggerUpdate = useCallback(() => {
+    if (mountedRef.current) {
+      forceUpdate({});
+    }
   }, []);
 
-  // Auto-refresh every 5 minutes
   useEffect(() => {
-    const interval = setInterval(fetchData, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
+    // Subscribe to updates
+    const unsubscribe = liveDataManager.subscribe(triggerUpdate);
+    
+    // Cleanup on unmount
+    return () => {
+      mountedRef.current = false;
+      unsubscribe();
+    };
+  }, [triggerUpdate]);
 
-  const getLiveValue = (metricName: string): LiveMetricData | null => {
-    return liveData[metricName] || null;
-  };
+  // Helper functions
+  const getLiveValue = useCallback((metricName: string): LiveMetricData | null => {
+    return liveDataManager.getData()[metricName] || null;
+  }, [liveDataManager.getData()]);
 
-  const getChangeIndicator = (metricName: string): string => {
+  const getChangeIndicator = useCallback((metricName: string): string => {
     const data = getLiveValue(metricName);
     if (!data || !data.change || !data.value) return '→';
     
@@ -71,9 +159,9 @@ export function useLiveData() {
     } else {
       return '→';
     }
-  };
+  }, [getLiveValue]);
 
-  const getChangeColor = (metricName: string): string => {
+  const getChangeColor = useCallback((metricName: string): string => {
     const data = getLiveValue(metricName);
     if (!data || !data.change) return '#6b7280';
     
@@ -84,16 +172,16 @@ export function useLiveData() {
     } else {
       return '#6b7280'; // Gray
     }
-  };
+  }, [getLiveValue]);
 
   return {
-    liveData,
-    loading,
-    error,
-    lastFetched,
-    fetchData,
+    liveData: liveDataManager.getData(),
+    loading: liveDataManager.getLoading(),
+    error: liveDataManager.getError(),
+    lastFetched: liveDataManager.getLastFetched(),
+    fetchData: () => liveDataManager.refresh(),
     getLiveValue,
     getChangeIndicator,
     getChangeColor
   };
-}
+}*/

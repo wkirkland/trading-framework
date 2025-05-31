@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { metricsData } from '@/lib/data/metrics';
-import { useLiveData } from '@/lib/hooks/useLiveData';
+import { useLiveData } from '@/lib/context/DataContext'; 
 
 export function MetricsTable() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all');

@@ -535,7 +535,7 @@ tr:hover {
 
 .evidence-score-value {
   font-weight: 700;
-  fontSize: 1.1rem;
+  font-size: 1.1rem;
   min-width: 60px;
   text-align: right;
 }
