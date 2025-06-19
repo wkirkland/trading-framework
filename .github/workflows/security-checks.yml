@@ -1,0 +1,118 @@
+# .github/workflows/security-checks.yml
+
+name: Security Checks
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run ESLint security checks
+      run: npm run lint
+
+    - name: Check for exposed API keys in code
+      run: |
+        echo "Checking for exposed API keys..."
+        
+        # Check for literal api_key= patterns in source files
+        if grep -r "api_key=" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=tests . ; then
+          echo "❌ ERROR: Found potential API key exposure in source code!"
+          echo "API keys should never be embedded in URLs or code."
+          echo "Use the secure HTTP client instead."
+          exit 1
+        fi
+        
+        # Check for common API key patterns
+        if grep -r -E "(api_key|apikey|api-key)=[^&\s]+" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=tests . ; then
+          echo "❌ ERROR: Found potential API key patterns in source code!"
+          exit 1
+        fi
+        
+        # Check for hardcoded secrets patterns
+        if grep -r -E "['\"][a-zA-Z0-9]{32,}['\"]" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=tests . | grep -v -E "(test|mock|example|demo)" ; then
+          echo "⚠️  WARNING: Found potential hardcoded secrets (check if these are actual secrets)"
+          # Don't fail on this check, just warn
+        fi
+        
+        echo "✅ No obvious API key exposures found in source code."
+
+    - name: Check for secrets in environment files
+      run: |
+        echo "Checking for committed secrets in environment files..."
+        
+        # Check if .env files are committed (they shouldn't be)
+        if find . -name ".env" -not -path "./node_modules/*" -not -path "./.git/*" | grep -q .; then
+          echo "❌ ERROR: Found .env files committed to repository!"
+          echo "Environment files should not be committed as they may contain secrets."
+          find . -name ".env" -not -path "./node_modules/*" -not -path "./.git/*"
+          exit 1
+        fi
+        
+        # Check if .env.local files are committed (they shouldn't be)
+        if find . -name ".env.local" -not -path "./node_modules/*" -not -path "./.git/*" | grep -q .; then
+          echo "❌ ERROR: Found .env.local files committed to repository!"
+          echo "Local environment files should not be committed as they may contain secrets."
+          find . -name ".env.local" -not -path "./node_modules/*" -not -path "./.git/*"
+          exit 1
+        fi
+        
+        echo "✅ No environment files with secrets found in repository."
+
+    - name: Verify secure HTTP client usage
+      run: |
+        echo "Verifying secure HTTP client usage..."
+        
+        # Check that fredService.ts imports the secure client
+        if ! grep -q "import.*getFredClient.*@/lib/http/fredClient" lib/services/fredService.ts; then
+          echo "❌ ERROR: fredService.ts should import and use the secure FRED client!"
+          exit 1
+        fi
+        
+        # Check that there are no direct fetch calls with FRED API
+        if grep -r "fetch.*api\.stlouisfed\.org" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=tests . ; then
+          echo "❌ ERROR: Direct fetch calls to FRED API found! Use secure HTTP client instead."
+          exit 1
+        fi
+        
+        echo "✅ Secure HTTP client usage verified."
+
+    - name: Run tests with security focus
+      run: |
+        echo "Running security-focused tests..."
+        npm run test -- --testNamePattern="Security|security" --passWithNoTests
+        
+    - name: Generate security report
+      run: |
+        echo "## Security Check Results" > security-report.md
+        echo "" >> security-report.md
+        echo "✅ **API Key Exposure Check**: Passed" >> security-report.md
+        echo "✅ **Environment Files Check**: Passed" >> security-report.md  
+        echo "✅ **Secure Client Usage**: Passed" >> security-report.md
+        echo "✅ **ESLint Security Rules**: Passed" >> security-report.md
+        echo "" >> security-report.md
+        echo "_Generated on $(date)_" >> security-report.md
+
+    - name: Upload security report
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-report
+        path: security-report.md
+        retention-days: 30
