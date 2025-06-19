@@ -1,9 +1,8 @@
 // app/module1/page.tsx (Corrected Structure)
 'use client'; 
 
-import { useState } from 'react'; 
 import { MetricsTable } from '@/components/dashboard/MetricsTable';
-import { useSignalAnalysis, PocKeyMetricUI } from '@/lib/hooks/useSignalAnalysis'; 
+import { useSignalAnalysis } from '@/lib/hooks/useSignalAnalysis'; 
 import { THESIS_SCORING_RULES } from '@/lib/config/signalThesisRules'; 
 
 const pocThesisNames = Object.keys(THESIS_SCORING_RULES);

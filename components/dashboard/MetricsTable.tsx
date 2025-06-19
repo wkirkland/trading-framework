@@ -2,6 +2,7 @@
 'use client';
 
 import React from 'react'; // Import React if using JSX features like fragments
+
 import type { PocKeyMetricUI } from '@/lib/hooks/useSignalAnalysis'; // Import the type for the metrics data
 
 // Define props for the component

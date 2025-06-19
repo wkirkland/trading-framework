@@ -4,6 +4,7 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
 import { DataProvider } from '@/lib/context/DataContext'; // Import DataProvider
 
 // Helper function to create a QueryClient instance

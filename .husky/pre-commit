@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run linting
+echo "🔍 Running ESLint..."
+npm run lint
+
+# Run tests (critical for security)
+echo "🧪 Running tests..."
+npm run test:ci
+
+# Scan for secrets (if gitleaks is available)
+echo "🔒 Scanning for secrets..."
+if command -v gitleaks &> /dev/null; then
+    gitleaks protect --staged --config .gitleaks.toml
+else
+    echo "⚠️  Gitleaks not found - install from https://github.com/gitleaks/gitleaks for secret scanning"
+    echo "   Installation: https://github.com/gitleaks/gitleaks#installing"
+fi

@@ -1,0 +1,69 @@
+# Gitleaks configuration for Trading Framework
+# Detects API keys and secrets specific to our FRED/Alpha Vantage integration
+
+title = "Trading Framework Security Scan"
+
+[extend]
+# Use default gitleaks rules as base
+useDefault = true
+
+[[rules]]
+description = "FRED API Key"
+id = "fred-api-key"
+regex = '''(?i)(?:fred[_-]?api[_-]?key|api[_-]?key)\s*[:=]\s*['"]{0,1}([a-f0-9]{32})['"]{0,1}'''
+tags = ["api", "fred", "secret"]
+
+[[rules]]
+description = "Alpha Vantage API Key"
+id = "alpha-vantage-api-key"
+regex = '''(?i)(?:alpha[_-]?vantage[_-]?api[_-]?key|av[_-]?api[_-]?key)\s*[:=]\s*['"]{0,1}([A-Z0-9]{16})['"]{0,1}'''
+tags = ["api", "alpha-vantage", "secret"]
+
+[[rules]]
+description = "Generic API Key in URL"
+id = "api-key-in-url"
+regex = '''(?i)api[_-]?key=([a-zA-Z0-9]{16,64})'''
+tags = ["api", "url", "secret"]
+
+[[rules]]
+description = "Environment Variable Assignment with API Key"
+id = "env-api-key-assignment"
+regex = '''(?i)(?:FRED_API_KEY|ALPHA_VANTAGE_API_KEY)\s*=\s*['"]{0,1}([a-zA-Z0-9]{16,64})['"]{0,1}'''
+tags = ["env", "api", "secret"]
+
+[[rules]]
+description = "Hardcoded API Key in Code"
+id = "hardcoded-api-key"
+regex = '''(?i)(?:apikey|api_key|apiKey)\s*[:=]\s*['"]{1}([a-zA-Z0-9]{16,64})['"]{1}'''
+tags = ["hardcoded", "api", "secret"]
+
+[allowlist]
+description = "Allowlist for legitimate patterns"
+paths = [
+    # Allow test files to have mock API keys
+    '''tests/.*\.test\.ts''',
+    '''tests/.*\.spec\.ts''',
+    # Allow documentation files to reference API key concepts
+    '''.*\.md$''',
+    # Allow config files that explain API key usage
+    '''.*\.example$''',
+    '''\.env\.example$''',
+]
+
+commits = [
+    # Allow specific commits that are known to be safe
+]
+
+regexes = [
+    # Allow redacted API keys in logs
+    '''api_key=\*\*\*REDACTED\*\*\*''',
+    # Allow placeholder API keys in examples
+    '''(?i)your[_-]?api[_-]?key[_-]?here''',
+    '''(?i)insert[_-]?api[_-]?key''',
+    '''(?i)api[_-]?key[_-]?placeholder''',
+    # Allow test API keys
+    '''test[_-]?key[_-]?for[_-]?testing''',
+    '''fake[_-]?api[_-]?key''',
+    # Allow documentation examples
+    '''example[_-]?api[_-]?key''',
+]

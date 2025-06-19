@@ -1,8 +1,9 @@
 // app/api/fred-data/route.ts
 import { NextResponse } from 'next/server';
-import { fredService, MetricValue as FredMetricValue } from '@/lib/services/fredService';
-import { multiSourceDataService, MetricValue as AVMetricValue } from '@/lib/services/multiSourceDataService';
-import { getPocMetrics, Metric as PocMetricConfig, AlphaVantageFunctionParams } from '@/lib/data/metrics'; // Added AlphaVantageFunctionParams
+
+import { fredService } from '@/lib/services/fredService';
+import { multiSourceDataService } from '@/lib/services/multiSourceDataService';
+import { getPocMetrics, Metric as PocMetricConfig } from '@/lib/data/metrics';
 
 // Define a consistent structure for the data items in the API response
 interface ApiResponseMetricData {
@@ -140,8 +141,8 @@ export async function GET() {
           const rawData = fredRawDataMap[seriesId];
 
           if (rawData && rawData.value !== null && rawData.value !== undefined) {
-            let finalValue = rawData.value;
-            let yoYChange: number | undefined = undefined;
+            const finalValue = rawData.value;
+            const yoYChange: number | undefined = undefined;
             let units = metricConfig.units || extractUnitsFromDescription(metricConfig.description);
 
             if ((metricConfig.name === 'Core CPI' || metricConfig.name === 'Industrial Production Index') &&

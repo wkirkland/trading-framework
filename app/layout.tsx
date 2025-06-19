@@ -3,6 +3,7 @@
 
 import './globals.css'; // Your global styles
 import type { Metadata } from 'next';
+
 import Navigation from '@/components/layout/Navigation';
 // Remove DataProvider import for now, we will refactor it
 // import { DataProvider } from '@/lib/context/DataContext';

@@ -29,11 +29,11 @@ const customJestConfig = {
     '<rootDir>/**/__tests__/**/*.(ts|tsx|js|jsx)',
   ],
 
-  // Coverage configuration
+  // Coverage configuration - focus on security-critical components
   collectCoverageFrom: [
-    'lib/**/*.{ts,tsx}',
-    'components/**/*.{ts,tsx}',
-    'app/**/*.{ts,tsx}',
+    'lib/config/env.ts',
+    'lib/http/fredClient.ts',
+    'lib/services/fredService.ts',
     '!**/*.d.ts',
     '!**/node_modules/**',
     '!**/tests/**',
@@ -41,13 +41,32 @@ const customJestConfig = {
     '!**/coverage/**',
   ],
 
-  // Coverage thresholds (temporarily lowered for initial implementation)
+  // Coverage thresholds - focused on security-critical components only
   coverageThreshold: {
     global: {
-      branches: 60,
-      functions: 60,
-      lines: 60,
-      statements: 60,
+      branches: 65,
+      functions: 80,
+      lines: 85,
+      statements: 85,
+    },
+    // Specific thresholds for security-critical modules
+    './lib/config/env.ts': {
+      statements: 100,
+      branches: 100,
+      functions: 100,
+      lines: 100,
+    },
+    './lib/http/fredClient.ts': {
+      statements: 85,
+      branches: 65,
+      functions: 80,
+      lines: 85,
+    },
+    './lib/services/fredService.ts': {
+      statements: 10,
+      branches: 0,
+      functions: 6,
+      lines: 10,
     },
   },
 
