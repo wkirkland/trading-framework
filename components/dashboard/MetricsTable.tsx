@@ -1,299 +1,106 @@
+// app/components/dashboard/MetricsTable.tsx (Modified for PoC)
 'use client';
 
-import { useState, useMemo } from 'react';
-import { metricsData } from '@/lib/data/metrics';
-import { useLiveData } from '@/lib/context/DataContext'; 
+import React from 'react'; // Import React if using JSX features like fragments
 
-export function MetricsTable() {
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [priorityFilter, setPriorityFilter] = useState<string>('all');
-  const [timingFilter, setTimingFilter] = useState<string>('all');
-  const [frequencyFilter, setFrequencyFilter] = useState<string>('all');
+import type { PocKeyMetricUI } from '@/lib/hooks/useSignalAnalysis'; // Import the type for the metrics data
 
-  const { loading, error, lastFetched, fetchData, getLiveValue, getChangeIndicator, getChangeColor } = useLiveData();
+// Define props for the component
+interface MetricsTableProps {
+  metricsForTable: PocKeyMetricUI[];
+  // Optional: pass loading/error/lastFetched/fetchData from parent if needed here
+  // isLoading?: boolean;
+  // dataError?: any;
+  // lastDataFetched?: Date | null;
+  // onRefreshData?: () => void;
+}
 
-  const filteredMetrics = useMemo(() => {
-    return metricsData.filter(metric => {
-      return (categoryFilter === 'all' || metric.category === categoryFilter) &&
-             (priorityFilter === 'all' || metric.priority === priorityFilter) &&
-             (timingFilter === 'all' || metric.timing === timingFilter) &&
-             (frequencyFilter === 'all' || metric.frequency === frequencyFilter);
-    });
-  }, [categoryFilter, priorityFilter, timingFilter, frequencyFilter]);
+export function MetricsTable({ metricsForTable }: MetricsTableProps) {
+  // Filters are removed for PoC simplicity as the parent now controls the metric list (20 PoC metrics)
+  // Summary stats are also removed as they were based on all metricsData
 
-  const stats = useMemo(() => {
-    return {
-      total: filteredMetrics.length,
-      critical: filteredMetrics.filter(m => m.priority === 'critical').length,
-      leading: filteredMetrics.filter(m => m.timing === 'leading').length,
-      daily: filteredMetrics.filter(m => m.frequency === 'daily').length,
-    };
-  }, [filteredMetrics]);
-
-  const getPriorityClass = (priority: string) => {
-    return `priority-${priority}`;
+  const getSignalClass = (signal: string) => {
+    if (signal.includes('confirm')) return 'text-green-600 font-semibold';
+    if (signal.includes('contradict')) return 'text-red-600 font-semibold';
+    if (signal.includes('neutral')) return 'text-gray-600';
+    return 'text-gray-500'; // For 'no_data' or 'no_rule_match'
   };
 
-  const getTimingClass = (timing: string) => {
-    return `timing-${timing}`;
+  const getImpactClass = (impact: 'high' | 'medium' | 'low') => {
+    if (impact === 'high') return 'bg-red-100 text-red-700';
+    if (impact === 'medium') return 'bg-yellow-100 text-yellow-700';
+    if (impact === 'low') return 'bg-green-100 text-green-700';
+    return 'bg-gray-100 text-gray-700';
   };
 
-  const getFrequencyClass = (frequency: string) => {
-    return `frequency-${frequency}`;
-  };
-
-  const getCategoryClass = (category: string) => {
-    return `category-${category}`;
-  };
-
-  const formatLastUpdated = (date: Date | null) => {
-    if (!date) return '';
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
+  if (!metricsForTable || metricsForTable.length === 0) {
+    return (
+      <div className="card p-6 bg-white shadow-lg rounded-lg">
+        <p className="text-gray-500 italic">No metrics to display for the selected thesis or data is still loading.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="page-container">
-      <div className="card">
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h1>Module 1: Macro Environment Assessment</h1>
-          <p className="subtitle">
-            Comprehensive Economic, Political, Social & Environmental Metrics Dashboard
-          </p>
-          
-          {/* Live Data Status */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            gap: '1rem',
-            marginTop: '1rem',
-            fontSize: '0.9rem',
-            color: '#6b7280'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <div style={{ 
-                width: '8px', 
-                height: '8px', 
-                borderRadius: '50%',
-                background: loading ? '#f59e0b' : error ? '#ef4444' : '#10b981'
-              }}></div>
-              <span>
-                {loading ? 'Updating...' : error ? 'Using cached data' : 'Live data active'}
-              </span>
-            </div>
-            
-            {lastFetched && (
-              <span>Last updated: {formatLastUpdated(lastFetched)}</span>
-            )}
-            
-            <button 
-              onClick={fetchData}
-              disabled={loading}
-              style={{
-                background: 'none',
-                border: '1px solid #d1d5db',
-                borderRadius: '0.375rem',
-                padding: '0.25rem 0.75rem',
-                fontSize: '0.8rem',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                color: loading ? '#9ca3af' : '#374151'
-              }}
-            >
-              {loading ? 'Refreshing...' : 'Refresh'}
-            </button>
-          </div>
-        </div>
+    <div className="card p-0 md:p-0 lg:p-0 overflow-x-auto bg-white shadow-lg rounded-lg"> {/* Adjusted padding for table */}
+      {/* Header for the table section - can be simplified or removed if parent handles it */}
+      <div className="p-4 border-b border-gray-200">
+        <h2 className="text-xl font-semibold text-gray-700">Thesis Metric Analysis</h2>
+        <p className="text-xs text-gray-500">
+            Displaying metrics relevant to the selected thesis.
+        </p>
+      </div>
 
-        {/* Summary Stats */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-number">{stats.total}</div>
-            <div className="stat-label">Total Metrics</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-number">{stats.critical}</div>
-            <div className="stat-label">Critical Priority</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-number">{stats.leading}</div>
-            <div className="stat-label">Leading Indicators</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-number">{stats.daily}</div>
-            <div className="stat-label">Daily Updates</div>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="filters">
-          <div className="filter-group">
-            <label className="filter-label">Filter by Category</label>
-            <select 
-              value={categoryFilter} 
-              onChange={(e) => setCategoryFilter(e.target.value)}
-            >
-              <option value="all">All Categories</option>
-              <option value="economic">Economic</option>
-              <option value="political">Political</option>
-              <option value="social">Social/Demographic</option>
-              <option value="environmental">Environmental</option>
-              <option value="composite">Composite</option>
-            </select>
-          </div>
-
-          <div className="filter-group">
-            <label className="filter-label">Filter by Priority</label>
-            <select 
-              value={priorityFilter} 
-              onChange={(e) => setPriorityFilter(e.target.value)}
-            >
-              <option value="all">All Priorities</option>
-              <option value="critical">Critical</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-            </select>
-          </div>
-
-          <div className="filter-group">
-            <label className="filter-label">Filter by Timing</label>
-            <select 
-              value={timingFilter} 
-              onChange={(e) => setTimingFilter(e.target.value)}
-            >
-              <option value="all">All Types</option>
-              <option value="leading">Leading</option>
-              <option value="coincident">Coincident</option>
-              <option value="lagging">Lagging</option>
-            </select>
-          </div>
-
-          <div className="filter-group">
-            <label className="filter-label">Update Frequency</label>
-            <select 
-              value={frequencyFilter} 
-              onChange={(e) => setFrequencyFilter(e.target.value)}
-            >
-              <option value="all">All Frequencies</option>
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="quarterly">Quarterly</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Table */}
-        <div className="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Category</th>
-                <th>Metric Name</th>
-                <th>Current Value</th>
-                <th>Change</th>
-                <th>Description</th>
-                <th>Priority</th>
-                <th>Frequency</th>
-                <th>Timing</th>
-                <th>Source</th>
+      <div className="table-container"> {/* Ensure this class provides good table styling */}
+        <table>
+          <thead>
+            <tr>
+              <th>Metric Name</th>
+              <th>Current Value</th>
+              <th>Change</th>
+              <th>Thesis Signal</th>
+              <th>Reasoning / Matched Rule</th>
+              <th>Impact (Weight-Based)</th>
+              <th>Next Update</th>
+            </tr>
+          </thead>
+          <tbody>
+            {metricsForTable.map((metric, index) => (
+              <tr key={metric.name + index}> {/* Use a more stable key if possible, e.g., metric.name if unique */}
+                <td className="py-3 px-4 font-medium text-gray-800 whitespace-nowrap">
+                  {metric.name}
+                </td>
+                <td className="py-3 px-4 text-gray-700 whitespace-nowrap">
+                  {metric.value !== null ? metric.value.toFixed(2) : 'N/A'}
+                </td>
+                <td className={`py-3 px-4 whitespace-nowrap ${metric.change.includes('↑') ? 'text-green-500' : metric.change.includes('↓') ? 'text-red-500' : 'text-gray-500'}`}>
+                  {metric.change}
+                </td>
+                <td className={`py-3 px-4 whitespace-nowrap ${getSignalClass(metric.currentSignal)}`}>
+                  {metric.currentSignal.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                </td>
+                <td className="py-3 px-4 text-xs text-gray-600 max-w-xs break-words"> {/* max-w-xs for better layout */}
+                  {metric.reasoning}
+                  {/* Tooltip could be added here for longer reasoning */}
+                </td>
+                <td className="py-3 px-4 whitespace-nowrap">
+                  <span className={`px-2 py-1 text-xs rounded-full ${getImpactClass(metric.impact)}`}>
+                    {metric.impact.toUpperCase()}
+                  </span>
+                </td>
+                <td className="py-3 px-4 text-sm text-gray-500 whitespace-nowrap">
+                  {metric.nextUpdate}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {filteredMetrics.map((metric, index) => {
-                const liveValue = getLiveValue(metric.name);
-                const hasLiveData = liveValue && liveValue.value !== null;
-                
-                return (
-                  <tr key={index} className={getCategoryClass(metric.category)}>
-                    <td>
-                      <strong style={{ textTransform: 'capitalize' }}>
-                        {metric.category}
-                      </strong>
-                    </td>
-                    <td>
-                      <strong>{metric.name}</strong>
-                      {hasLiveData && (
-                        <div style={{ fontSize: '0.75rem', color: '#10b981', marginTop: '0.25rem' }}>
-                          ● Live Data
-                        </div>
-                      )}
-                    </td>
-                    <td>
-                      {hasLiveData ? (
-                        <div>
-                          <strong style={{ fontSize: '1.1rem' }}>
-                            {liveValue.formatted}
-                          </strong>
-                          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                            as of {new Date(liveValue.date).toLocaleDateString()}
-                          </div>
-                        </div>
-                      ) : (
-                        <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>
-                          Static data
-                        </span>
-                      )}
-                    </td>
-                    <td>
-                      {hasLiveData && liveValue.change !== undefined ? (
-                        <div style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          gap: '0.25rem',
-                          color: getChangeColor(metric.name),
-                          fontWeight: '600'
-                        }}>
-                          <span style={{ fontSize: '1.2rem' }}>
-                            {getChangeIndicator(metric.name)}
-                          </span>
-                          <span>
-                            {Math.abs(liveValue.change).toFixed(2)}
-                          </span>
-                        </div>
-                      ) : (
-                        <span style={{ color: '#9ca3af' }}>—</span>
-                      )}
-                    </td>
-                    <td>
-                      <div style={{ fontSize: '0.9rem', lineHeight: '1.4', maxWidth: '300px' }}>
-                        {metric.description}
-                      </div>
-                    </td>
-                    <td>
-                      <span className={getPriorityClass(metric.priority)}>
-                        {metric.priority.toUpperCase()}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={getFrequencyClass(metric.frequency)} style={{ textTransform: 'capitalize' }}>
-                        {metric.frequency}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={getTimingClass(metric.timing)} style={{ textTransform: 'capitalize' }}>
-                        {metric.timing}
-                      </span>
-                    </td>
-                    <td>
-                      <div style={{ fontSize: '0.85rem', color: '#666' }}>{metric.source}</div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Footer */}
-        <div style={{ textAlign: 'center', marginTop: '2rem', color: '#666' }}>
-          <p>Showing {filteredMetrics.length} of {metricsData.length} metrics</p>
-          <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>
-            Live economic data powered by FRED (Federal Reserve Economic Data)
-          </p>
-        </div>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="p-4 border-t border-gray-200 text-center text-sm text-gray-500">
+        <p>Showing {metricsForTable.length} metrics for the current thesis.</p>
       </div>
     </div>
   );
 }
+
+

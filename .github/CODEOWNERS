@@ -1,0 +1,44 @@
+# CODEOWNERS for Trading Framework
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global ownership - all files require tech lead review
+* @wkirkland
+
+# Security-critical components require additional security review
+lib/config/env.ts @wkirkland @security-team
+lib/http/fredClient.ts @wkirkland @security-team
+lib/services/fredService.ts @wkirkland @security-team
+lib/services/multiSourceDataService.ts @wkirkland @security-team
+
+# Infrastructure and DevOps components
+.github/workflows/ @wkirkland @devops-team
+docker-compose.yml @wkirkland @devops-team
+Dockerfile.dev @wkirkland @devops-team
+.gitleaks.toml @wkirkland @security-team
+
+# Configuration and tooling
+jest.config.js @wkirkland @qa-team
+eslint.config.mjs @wkirkland @qa-team
+commitlint.config.js @wkirkland @devops-team
+.husky/ @wkirkland @devops-team
+
+# API routes require backend review
+app/api/ @wkirkland @backend-team
+
+# Component changes require frontend review  
+components/ @wkirkland @frontend-team
+app/*/page.tsx @wkirkland @frontend-team
+
+# Test files require QA review
+tests/ @wkirkland @qa-team
+**/*.test.ts @wkirkland @qa-team
+**/*.spec.ts @wkirkland @qa-team
+
+# Documentation requires tech writing review
+README.md @wkirkland @tech-writing
+docs/ @wkirkland @tech-writing
+*.md @wkirkland @tech-writing
+
+# Security-specific files
+SECURITY_REFACTOR_SUMMARY.md @wkirkland @security-team
+.env.example @wkirkland @security-team

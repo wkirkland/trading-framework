@@ -4,62 +4,109 @@
 // These types are used by both utility functions below.
 
 // Type for the getLiveValue function signature (from useLiveData via DataContext)
-// If you have a central types file, you could import this.
 interface LiveMetricData {
-    value: number | null;
-    formatted: string;
-    date: string;
-    change?: number;
-    lastUpdated: string;
-  }
-  
-  // Making GetLiveValueFunction exportable in case it's useful elsewhere, though not strictly necessary
-  // if only used internally by functions within this file.
-  export type GetLiveValueFunction = (metricName: string) => LiveMetricData | null;
-  
-  // Type for marketData object
-  export interface MarketIndicators {
-    vix: number | null;
-    sp500: number | null;
-    dollarIndex: number | null;
-    gold: number | null;
-  }
-  
-  // Type for the returned evidence scores
-  export interface EvidenceScores {
-    economic: number;
-    political: number;
-    social: number;
-    environmental: number;
-    market: number;
-    overall: number;
-  }
-  
-  // Type for a single rule within THESIS_SCORING_RULES (economic or market part)
-  interface ScoringRuleDetail {
-    weight: number;
-    threshold: { negative: number; positive: number };
-  }
-  
-  // Type for the structure of rules for a single thesis
-  export interface ThesisScoringRules { // Exporting in case other modules might need this structure
-    economic: Record<string, ScoringRuleDetail>;
-    market?: Record<string, ScoringRuleDetail>;
-  }
-  
-  // Type for individual key metric data
-  export interface SignalData {
-    name: string;
-    currentSignal: 'confirm' | 'contradict' | 'neutral';
-    impact: 'high' | 'medium' | 'low';
-    change: string;
-    nextUpdate: string;
-    value?: number | null;
-    reasoning?: string;
-    source?: string;
-    formatted?: string;
-  }
-  
+  value: number | null;
+  formatted: string;
+  date: string;
+  change?: number;
+  lastUpdated: string;
+}
+export type GetLiveValueFunction = (metricName: string) => LiveMetricData | null;
+// Type for marketData object
+export interface MarketIndicators {
+vix: number | null;
+sp500: number | null;
+dollarIndex: number | null;
+gold: number | null;
+}
+// Type for the returned evidence scores
+export interface EvidenceScores {
+economic: number;
+political: number;
+social: number;
+environmental: number;
+market: number;
+overall: number;
+}
+// Type for a single rule within THESIS_SCORING_RULES (economic or market part) - OLD STRUCTURE
+interface ScoringRuleDetail {
+weight: number;
+threshold: { negative: number; positive: number };
+}
+// Type for the structure of rules for a single thesis - OLD STRUCTURE
+export interface ThesisScoringRules {
+economic: Record<string, ScoringRuleDetail>;
+market?: Record<string, ScoringRuleDetail>;
+}
+// Type for individual key metric data
+export interface SignalData {
+name: string;
+currentSignal: 'confirm' | 'contradict' | 'neutral';
+impact: 'high' | 'medium' | 'low';
+change: string;
+nextUpdate: string;
+value?: number | null;
+reasoning?: string;
+source?: string;
+formatted?: string;
+}
+export interface BasicEvidenceScores {
+  economic: number;
+  political: number;
+  social: number;
+  environmental: number;
+  overall: number;
+}
+export interface BasicSignalData {
+  name: string;
+  currentSignal: 'confirm' | 'contradict' | 'neutral';
+  impact: 'high' | 'medium' | 'low';
+  change: string;
+  nextUpdate: string;
+  value?: number | null;
+  reasoning?: string;
+}
+export interface ConflictAlert {
+  title: string;
+  severity: 'HIGH' | 'MEDIUM' | 'LOW';
+  description: string;
+  isActive: boolean;
+  marketBased?: boolean;
+}
+export interface ThresholdTrigger {
+  title: string;
+  conditions: string[];
+  status: 'Safe Zone' | 'Monitor Zone' | 'Alert Zone';
+  triggered: string;
+  statusColor: string;
+  conditionsMet: number;
+  totalConditions: number;
+  category: 'economic' | 'market' | 'geopolitical';
+}
+  // --- POC TYPE DEFINITIONS START ---
+// We import MetricRule from where it's defined to ensure consistency.
+// We also import the type of the THESIS_SCORING_RULES object itself for strong typing.
+import type {
+  MetricRule as PocMetricRule, // Using 'as' to alias, assuming MetricRule is exported from signalThesisRules
+  THESIS_SCORING_RULES as POC_THESIS_SCORING_RULES_TYPE // Type of the exported object
+} from '@/lib/config/signalThesisRules'; // Ensure this path is correct
+
+export interface PocMetricAnalysisDetail {
+  name: string;
+  currentValue: number | null;
+  signal: string;
+  individualScore: number;
+  weight: number;
+  weightedContribution: number;
+  matchedRuleCondition?: string;
+}
+
+export interface PocAnalysisOutput {
+  totalWeightedScore: number;
+  metricDetails: PocMetricAnalysisDetail[];
+}
+// --- POC TYPE DEFINITIONS END ---
+
   // --- UTILITY FUNCTIONS ---
   
   /**
@@ -67,7 +114,7 @@ interface LiveMetricData {
    */
   export function calculateEnhancedEvidenceScores(
     selectedThesis: string,
-    allThesisScoringRules: Record<string, ThesisScoringRules>,
+    allThesisScoringRules: Record<string, ThesisScoringRules>,// This ThesisScoringRules is your OLD one
     marketData: MarketIndicators,
     getLiveValue: GetLiveValueFunction
   ): EvidenceScores {
@@ -542,3 +589,175 @@ export interface ThresholdTrigger {
       overall
     };
   }
+
+  // Type for basic signal data (no source/formatted from market data)
+export interface BasicSignalData {
+    name: string;
+    currentSignal: 'confirm' | 'contradict' | 'neutral';
+    impact: 'high' | 'medium' | 'low';
+    change: string;
+    nextUpdate: string;
+    value?: number | null;
+    reasoning?: string;
+  }
+  
+  // Generates key metrics for the basic signal analysis
+  export function generateBasicKeyMetrics(
+    selectedThesis: string,
+    // Assuming ThesisScoringRules might have an optional 'market' property,
+    // or your basic rules object simply won't have it.
+    allBasicThesisScoringRules: Record<string, Pick<ThesisScoringRules, 'economic'>>, // Ensure only economic rules are expected
+    getLiveValue: GetLiveValueFunction
+  ): BasicSignalData[] {
+    const metrics: BasicSignalData[] = [];
+    const rules = allBasicThesisScoringRules[selectedThesis];
+  
+    if (!rules || !rules.economic) {
+      console.warn(`No basic scoring rules found for thesis (keyMetrics): ${selectedThesis}`);
+      return [];
+    }
+  
+    Object.entries(rules.economic).forEach(([metricName, rule]) => {
+      const liveValue = getLiveValue(metricName);
+      let signal: 'confirm' | 'contradict' | 'neutral' = 'neutral';
+      let reasoning = 'No data available';
+  
+      if (liveValue?.value !== null && liveValue?.value !== undefined) {
+        const value = liveValue.value;
+        const formattedValue = liveValue.formatted || value.toFixed(0); // For reasoning
+  
+        // Using raw thresholds from allBasicThesisScoringRules.economic[metricName].threshold
+        // Ensure your signalThesisRules.ts uses raw numbers for thresholds if you made that change for enhanced.
+        const positiveThresholdDisplay = (metricName === 'Initial Jobless Claims' && rule.threshold.positive >= 1000) ?
+                                         `${(rule.threshold.positive / 1000).toFixed(0)}K` :
+                                         rule.threshold.positive.toString();
+        const negativeThresholdDisplay = (metricName === 'Initial Jobless Claims' && rule.threshold.negative >= 1000) ?
+                                         `${(rule.threshold.negative / 1000).toFixed(0)}K` :
+                                         rule.threshold.negative.toString();
+  
+        if (value <= rule.threshold.positive) {
+          signal = 'confirm';
+          reasoning = `${formattedValue} supports thesis (≤${positiveThresholdDisplay})`;
+        } else if (value >= rule.threshold.negative) {
+          signal = 'contradict';
+          reasoning = `${formattedValue} contradicts thesis (≥${negativeThresholdDisplay})`;
+        } else {
+          signal = 'neutral';
+          reasoning = `${formattedValue} is neutral`;
+        }
+      }
+  
+      metrics.push({
+        name: metricName,
+        currentSignal: signal,
+        impact: rule.weight >= 0.25 ? 'high' : rule.weight >= 0.15 ? 'medium' : 'low',
+        change: liveValue?.change !== undefined ?
+          (liveValue.change > 0 ? `↑ +${Math.abs(liveValue.change).toFixed(2)}` :
+           liveValue.change < 0 ? `↓ -${Math.abs(liveValue.change).toFixed(2)}` : '→ 0.00') : '→',
+        nextUpdate: getNextUpdateEstimate(metricName), // Uses getNextUpdateEstimate from this file
+        value: liveValue?.value,
+        reasoning
+        // No 'source' or 'formatted' field for BasicSignalData
+      });
+    });
+    return metrics;
+  }
+
+  // --- POC ANALYSIS FUNCTIONS START ---
+
+/**
+ * Calculates the "Weight of Evidence" for a selected PoC thesis
+ * based on the new rule structure defined in signalThesisRules.ts.
+ */             
+export function calculatePocWeightOfEvidence(
+  selectedThesisName: string,
+  // This uses the imported type of your actual THESIS_SCORING_RULES object
+  allPocThesisScoringRules: typeof POC_THESIS_SCORING_RULES_TYPE, // This type comes from the import at the top of analysisUtils.ts
+  getLiveValue: GetLiveValueFunction // This type is defined at the top of your analysisUtils.ts file
+): PocAnalysisOutput { // This type is defined in your "POC TYPE DEFINITIONS START" section in analysisUtils.ts
+  const thesisRules = allPocThesisScoringRules[selectedThesisName];
+
+  let totalWeightedScore = 0;
+  const metricDetails: PocMetricAnalysisDetail[] = []; // This type is defined in your "POC TYPE DEFINITIONS START" section
+
+  if (!thesisRules || !thesisRules.metrics) {
+    console.warn(`[calculatePocWeightOfEvidence] No PoC scoring rules found for thesis: ${selectedThesisName}`);
+    return { totalWeightedScore: 0, metricDetails: [] };
+  }
+
+  // Iterate over the metrics defined in the THESIS_SCORING_RULES for the selected thesis
+  for (const metricName in thesisRules.metrics) {
+    // Ensure we are iterating over own properties, not from prototype chain
+    if (Object.prototype.hasOwnProperty.call(thesisRules.metrics, metricName)) {
+      const metricConfig = thesisRules.metrics[metricName];
+      const liveData = getLiveValue(metricName);
+      const currentValue = liveData?.value ?? null; // Use nullish coalescing for null or undefined
+
+      let metricMatchedThisIteration = false; 
+      let individualScore = 0;
+      // Use the imported PocMetricRule['signal'] type and add our custom 'no_data'/'neutral_no_match'
+      let signal: PocMetricRule['signal'] | 'no_data' | 'neutral_no_match' = 'no_data';
+      let matchedRuleConditionText = 'N/A (No Live Data)';
+
+      if (currentValue !== null) {
+        signal = 'neutral_no_match'; // Default if value exists but no rule matches
+        matchedRuleConditionText = `No rule matched for value: ${currentValue.toFixed(2)}`; 
+
+        // Ensure metricConfig.rules is an array before iterating
+        if (Array.isArray(metricConfig.rules)) {
+          for (const rule of metricConfig.rules as PocMetricRule[]) { // Type assertion for rule using imported PocMetricRule
+            let conditionMet = false;
+            let conditionTextForThisRule = '';
+
+            if (rule.if_above !== undefined) {
+              conditionTextForThisRule = `value (${currentValue.toFixed(2)}) > ${rule.if_above}`;
+              if (currentValue > rule.if_above) {
+                conditionMet = true;
+              }
+            } else if (rule.if_below !== undefined) {
+              conditionTextForThisRule = `value (${currentValue.toFixed(2)}) < ${rule.if_below}`;
+              if (currentValue < rule.if_below) {
+                conditionMet = true;
+              }
+            } else if (rule.if_between && Array.isArray(rule.if_between) && rule.if_between.length === 2) {
+              // Convention: [inclusive_lower, exclusive_upper]
+              conditionTextForThisRule = `value (${currentValue.toFixed(2)}) >= ${rule.if_between[0]} AND value < ${rule.if_between[1]}`;
+              if (currentValue >= rule.if_between[0] && currentValue < rule.if_between[1]) {
+                conditionMet = true;
+              }
+            }
+
+            if (conditionMet) {
+              individualScore = rule.score;
+              signal = rule.signal;
+              matchedRuleConditionText = conditionTextForThisRule; 
+              metricMatchedThisIteration = true;
+              break; 
+            }
+          }
+        } else {
+            console.warn(`[calculatePocWeightOfEvidence] No 'rules' array found for metric: ${metricName} in thesis: ${selectedThesisName}`);
+        }
+      }
+      
+      const weightedContribution = individualScore * metricConfig.weight;
+      totalWeightedScore += weightedContribution;
+
+      metricDetails.push({
+        name: metricName,
+        currentValue: currentValue,
+        // Cast signal to string because its type is a union including 'no_data' etc. 
+        // which PocMetricAnalysisDetail's 'signal' field (if strictly typed to PocMetricRule['signal']) might not expect.
+        // It's safer to have PocMetricAnalysisDetail.signal as just `string`.
+        signal: signal as string, 
+        individualScore: individualScore,
+        weight: metricConfig.weight,
+        weightedContribution: weightedContribution,
+        matchedRuleCondition: matchedRuleConditionText,
+      });
+    }
+  }
+
+  return { totalWeightedScore, metricDetails };
+}
+// --- POC ANALYSIS FUNCTIONS END ---

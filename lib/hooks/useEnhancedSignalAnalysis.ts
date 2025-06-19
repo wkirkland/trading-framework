@@ -1,6 +1,7 @@
 // lib/hooks/useEnhancedSignalAnalysis.ts
 
 import { useState, useMemo } from 'react';
+
 import { useLiveData } from '@/lib/context/DataContext';
 import { ENHANCED_THESIS_SCORING_RULES } from '@/lib/config/enhancedThesisRules';
 import {
