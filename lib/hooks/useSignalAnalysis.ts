@@ -1,3 +1,132 @@
+// lib/hooks/useSignalAnalysis.ts (PoC Version)
+
+import { useState, useMemo } from 'react';
+import { useLiveData } from '@/lib/context/DataContext'; // Assuming correct path
+import { THESIS_SCORING_RULES } from '@/lib/config/signalThesisRules'; // Our NEW PoC rules
+import {
+  calculatePocWeightOfEvidence, // Our NEW PoC calculation function
+  PocAnalysisOutput,            // Type for the output of the new function
+  PocMetricAnalysisDetail,      // Type for detailed metric analysis
+  // GetLiveValueFunction,    // Already available via useLiveData
+} from '@/lib/utils/analysisUtils'; // Assuming correct path
+// Note: We might not need to import GetLiveValueFunction type explicitly if useLiveData provides it typed.
+
+// Define a type for the key metrics our UI will consume for the PoC
+// This can be adapted from the old SignalData or be a new structure.
+// Let's make it similar to the old one but based on new data.
+export interface PocKeyMetricUI {
+  name: string;
+  currentSignal: string; // From PocMetricAnalysisDetail.signal
+  value: number | null;
+  reasoning: string; // We'll construct this
+  impact: 'high' | 'medium' | 'low'; // Determined by weight
+  change: string; // Formatted change
+  nextUpdate: string; // From a helper
+  // Add other fields if your UI expects them
+}
+
+// Helper function (can be moved to analysisUtils.ts if used elsewhere, or kept local)
+// This version is simplified for the PoC and assumes metrics.ts might have frequency data.
+// For now, let's use a simplified version.
+const getNextUpdateEstimateForPoc = (metricName: string): string => {
+  // TODO: Enhance this to use frequency from metrics.ts if available for more accuracy
+  const dailyMetrics = ['Fed Funds Rate', '10-Year Treasury Yield', 'VIX Index', 'S&P 500', 'Dollar Index'];
+  const weeklyMetrics = ['Initial Jobless Claims'];
+  // Most others are monthly or quarterly
+  if (dailyMetrics.includes(metricName)) return 'Daily/Real-time';
+  if (weeklyMetrics.includes(metricName)) return 'Weekly';
+  return 'Monthly/Quarterly';
+};
+
+export function useSignalAnalysis() {
+  const { loading, error, lastFetched, fetchData, getLiveValue } = useLiveData();
+  // Default to one of our 3 PoC thesis names
+  const [selectedThesis, setSelectedThesis] = useState<string>('strong-growth-stable-inflation');
+
+  const analysisResults = useMemo((): {
+    weightOfEvidence: number;
+    keyMetricsForUI: PocKeyMetricUI[];
+  } => {
+    // Ensure getLiveValue is available and data isn't loading to prevent errors during initial render
+    if (loading || typeof getLiveValue !== 'function') {
+      return {
+        weightOfEvidence: 0,
+        keyMetricsForUI: [],
+      };
+    }
+
+    // Call the new PoC-specific calculation function
+    const { totalWeightedScore, metricDetails }: PocAnalysisOutput = calculatePocWeightOfEvidence(
+      selectedThesis,
+      THESIS_SCORING_RULES, // Pass the imported PoC rules
+      getLiveValue
+    );
+
+    // Format metricDetails into PocKeyMetricUI for the dashboard
+    const formattedKeyMetrics: PocKeyMetricUI[] = metricDetails.map(
+      (detail: PocMetricAnalysisDetail): PocKeyMetricUI => {
+        const liveData = getLiveValue(detail.name); // Get full live data for change, etc.
+        let changeStr = '→';
+        if (liveData?.change !== undefined && liveData.change !== null) {
+          if (liveData.change > 0) changeStr = `↑ +${Math.abs(liveData.change).toFixed(2)}`;
+          else if (liveData.change < 0) changeStr = `↓ -${Math.abs(liveData.change).toFixed(2)}`;
+          else changeStr = '→ 0.00';
+        }
+
+        // Basic reasoning for PoC
+        let reasoning = `Value: ${detail.currentValue !== null ? detail.currentValue.toFixed(2) : 'N/A'}. Signal: ${detail.signal}. Matched: ${detail.matchedRuleCondition || 'N/A'}`;
+        if (detail.signal === 'no_data') {
+            reasoning = 'No live data available for this metric.';
+        } else if (detail.signal === 'neutral_no_match'){
+            reasoning = `Live value ${detail.currentValue !== null ? detail.currentValue.toFixed(2) : 'N/A'} did not match specific rules; considered neutral.`;
+        }
+
+
+        return {
+          name: detail.name,
+          currentSignal: detail.signal,
+          value: detail.currentValue,
+          reasoning: reasoning,
+          impact: detail.weight >= 0.10 ? 'high' : detail.weight >= 0.05 ? 'medium' : 'low', // Example impact from weight
+          change: changeStr,
+          nextUpdate: getNextUpdateEstimateForPoc(detail.name),
+        };
+      }
+    );
+
+    return {
+      weightOfEvidence: totalWeightedScore,
+      keyMetricsForUI: formattedKeyMetrics,
+    };
+  }, [selectedThesis, loading, getLiveValue]); // Add other relevant dependencies from useLiveData if they affect values used
+
+  // For PoC, conflictAlerts and thresholdTriggers are out of scope for this core hook.
+  // They can be separate hooks or added back later if their logic is updated.
+  const conflictAlerts = useMemo(() => [], []); // Empty array for PoC
+  const thresholdTriggers = useMemo(() => [], []); // Empty array for PoC
+
+  return {
+    selectedThesis,
+    setSelectedThesis,
+    evidenceScores: { // Adapt to the old 'evidenceScores' structure if UI expects it, or update UI
+        overall: analysisResults.weightOfEvidence,
+        economic: analysisResults.weightOfEvidence, // For PoC, overall and economic might be the same
+        market: 0, // No separate market score in PoC's primary calculation
+        political: 0,
+        social: 0,
+        environmental: 0,
+    },
+    keyMetrics: analysisResults.keyMetricsForUI, // This is the new detailed list
+    conflictAlerts,    // Kept for API compatibility with UI, but empty for PoC
+    thresholdTriggers, // Kept for API compatibility with UI, but empty for PoC
+    loading,
+    error,
+    lastFetched,
+    fetchData,
+  };
+}
+
+/*
 // lib/hooks/useSignalAnalysis.ts (FIXED for deployment)
 
 import { useState, useMemo } from 'react';
@@ -192,4 +321,4 @@ export function useSignalAnalysis() {
     lastFetched,
     fetchData
   };
-}
+} */
