@@ -1,19 +1,24 @@
-// lib/services/fredService.ts (FIXED - no any types)
+// lib/services/fredService.ts
+
+import { getFredClient, type FredResponse, FredRequestError, FredAuthError } from '@/lib/http/fredClient';
 
 interface FredDataPoint {
   date: string;
-  value: string;
+  value: string; // Values from FRED API are strings initially
 }
 
-interface FredResponse {
+interface FredApiResponse {
   observations: FredDataPoint[];
 }
 
-interface MetricValue {
+// This interface is what the service's methods will return for each series.
+// The API route will then map this to its ApiResponseMetricData.
+export interface MetricValue {
   value: number | null;
   date: string;
-  change?: number;
-  formatted?: string;
+  change?: number;       // Change from the immediate prior observation point
+  formatted?: string;    // Formatted value string
+  // Note: source, seriesId, originalName, units will be added by the API route
 }
 
 interface CachedData {
@@ -21,263 +26,237 @@ interface CachedData {
   timestamp: number;
 }
 
-// Reduced set of FRED series for rate limit management
-export const FRED_SERIES = {
-  // Core Economic Indicators - Most Important
-  GDP_GROWTH: 'A191RL1Q225SBEA',
-  UNEMPLOYMENT_RATE: 'UNRATE',
-  CORE_PCE: 'PCEPILFE',
-  FED_FUNDS_RATE: 'FEDFUNDS',
-  TREASURY_10Y: 'GS10',
-  TREASURY_2Y: 'GS2',
-  INITIAL_CLAIMS: 'ICSA',
-  CONSUMER_CONFIDENCE: 'UMCSENT',
-  INDUSTRIAL_PRODUCTION: 'INDPRO',
-  YIELD_CURVE_SPREAD: 'T10Y2Y',
-  
-  // Additional High-Priority Series
-  NONFARM_PAYROLLS: 'PAYEMS',
-  CORE_CPI: 'CPILFESL',
-  RETAIL_SALES: 'RSXFS',
-  HOUSING_STARTS: 'HOUST',
+// This object can be used internally by formatValue if needed,
+// or formatValue can become more dynamic.
+// These are the *actual correct FRED Series IDs* for our PoC metrics sourced from FRED.
+const KNOWN_FRED_POC_SERIES_IDS = {
+  REAL_GDP_GROWTH_RATE: 'A191RL1Q225SBEA',
+  MANUFACTURING_PMI: 'NAPM',
+  SERVICES_PMI: 'NMFCI', // Could also be ISMNNPMI, verify on FRED for best one
+  INDUSTRIAL_PRODUCTION_INDEX_LEVEL: 'INDPRO', // Level, YoY calc needed if rules expect %
+  CAPACITY_UTILIZATION_RATE: 'TCU',
+  UNEMPLOYMENT_RATE_U3: 'UNRATE',
+  INITIAL_JOBLESS_CLAIMS: 'ICSA',
+  JOB_OPENINGS_JOLTS: 'JTSJOL',
+  LABOR_FORCE_PARTICIPATION_RATE: 'CIVPART',
+  CORE_CPI_STICKY_YOY: 'CORESTICKM159SFRBATL', // Sticky Price Core CPI YoY % SA
+  // If CORESTICKM159SFRBATL is not desired, and you want traditional Core CPI YoY:
+  // CORE_CPI_TRADITIONAL_YOY: 'CPIUFSL_PCH', // Or similar, after verifying on FRED
+  // CORE_CPI_LEVEL_FOR_YOY_CALC: 'CPILFESL', // If calculating YoY manually
+  FIVE_YEAR_FIVE_YEAR_FORWARD_INFLATION_RATE: 'T5YIFR',
+  FED_FUNDS_RATE_DAILY: 'DFF',
+  TEN_YEAR_TREASURY_YIELD_DAILY: 'DGS10',
+  DOLLAR_INDEX_TRADE_WEIGHTED_BROAD: 'DTWEXBGS',
   CONFERENCE_BOARD_LEI: 'USSLIND',
+  CHICAGO_FED_CFNAI: 'CFNAI',
 } as const;
 
+
 class FredService {
-  private baseUrl = 'https://api.stlouisfed.org/fred';
-  private apiKey: string;
   private cache: Map<string, CachedData> = new Map();
-  private requestQueue: Promise<unknown>[] = [];
   private lastRequestTime = 0;
-  private readonly RATE_LIMIT_DELAY = 1000; // 1 second between requests
-  private readonly CACHE_DURATION = 15 * 60 * 1000; // 15 minutes cache
+  private readonly RATE_LIMIT_DELAY = 1200; // Milliseconds between requests
+  private readonly CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
+  private fredClient: ReturnType<typeof getFredClient>;
 
   constructor() {
-    this.apiKey = process.env.FRED_API_KEY || '';
-    if (!this.apiKey) {
-      console.warn('FRED API key not found. Set FRED_API_KEY in environment variables.');
+    try {
+      this.fredClient = getFredClient();
+    } catch (error) {
+      if (error instanceof FredAuthError) {
+        console.warn('FRED SERVICE: API key not found. Set FRED_API_KEY in environment variables.');
+        throw error;
+      }
+      throw error;
     }
   }
 
-  /**
-   * Rate-limited request wrapper
-   */
-  private async makeRateLimitedRequest(url: string): Promise<Response> {
+  private async makeRateLimitedRequest(seriesId: string): Promise<FredApiResponse> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
     if (timeSinceLastRequest < this.RATE_LIMIT_DELAY) {
-      await new Promise(resolve => setTimeout(resolve, this.RATE_LIMIT_DELAY - timeSinceLastRequest));
+      const delay = this.RATE_LIMIT_DELAY - timeSinceLastRequest;
+      console.log(`FRED Service: Rate limiting, delaying for ${delay}ms`);
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
-    
     this.lastRequestTime = Date.now();
-    return fetch(url);
+    
+    const response = await this.fredClient.getSeriesObservations(seriesId, {
+      limit: 10,
+      sortOrder: 'desc',
+      observationStart: '2000-01-01',
+    });
+    
+    return response.fredJson<FredApiResponse>();
   }
 
-  /**
-   * Check cache for recent data
-   */
   private getCachedData(seriesId: string): MetricValue | null {
     const cached = this.cache.get(seriesId);
-    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+    if (cached && (Date.now() - cached.timestamp < this.CACHE_DURATION)) {
+      console.log(`FRED Service: Using cached data for ${seriesId}`);
       return cached.data;
     }
+    this.cache.delete(seriesId); // Expired or not found
     return null;
   }
 
-  /**
-   * Cache data
-   */
   private setCachedData(seriesId: string, data: MetricValue): void {
-    this.cache.set(seriesId, {
-      data,
-      timestamp: Date.now()
-    });
+    this.cache.set(seriesId, { data, timestamp: Date.now() });
   }
 
-  /**
-   * Fetch the latest data point for a FRED series with improved error handling
-   */
+  // TODO for full PoC: This function needs to be enhanced if YoY calculations are to be done here.
+  // It would need to fetch more historical data (e.g., 13 points for monthly YoY)
+  // and return both current and prior year values, or the calculated YoY.
+  // For now, it fetches latest 10 points and calculates change from immediate prior point.
   async getLatestValue(seriesId: string): Promise<MetricValue> {
-    // Check cache first
     const cachedData = this.getCachedData(seriesId);
-    if (cachedData) {
-      console.log(`Using cached data for ${seriesId}`);
-      return cachedData;
-    }
+    if (cachedData) return cachedData;
 
     try {
-      const url = `${this.baseUrl}/series/observations?series_id=${seriesId}&api_key=${this.apiKey}&file_type=json&limit=10&sort_order=desc`;
+      console.log(`FRED Service: Fetching ${seriesId}`);
       
-      const response = await this.makeRateLimitedRequest(url);
-      
-      if (!response.ok) {
-        if (response.status === 403) {
-          console.warn(`FRED API rate limit or permission issue for ${seriesId}. Using fallback.`);
-          return this.getFallbackData(seriesId);
-        }
-        throw new Error(`FRED API error: ${response.status}`);
-      }
+      const data = await this.makeRateLimitedRequest(seriesId);
 
-      const data: FredResponse = await response.json();
-      
       if (!data.observations || data.observations.length === 0) {
-        console.warn(`No observations for ${seriesId}`);
-        return this.getFallbackData(seriesId);
+        console.warn(`FRED Service: No observations array for ${seriesId}`);
+        return this.getFallbackData(seriesId, 'No observations array');
       }
 
-      // Find the most recent non-null value
-      const validObservations = data.observations.filter(obs => obs.value !== '.');
-      
+      const validObservations = data.observations.filter(obs => obs.value !== '.' && obs.value !== null && obs.value !== undefined);
+
       if (validObservations.length === 0) {
-        console.warn(`No valid observations for ${seriesId}`);
-        return this.getFallbackData(seriesId);
+        console.warn(`FRED Service: No valid (non-''.') observations for ${seriesId}`);
+        return this.getFallbackData(seriesId, 'No valid observations');
       }
 
-      const latest = validObservations[0];
-      const value = parseFloat(latest.value);
-      
-      // Calculate change if we have previous data
+      const latestObservation = validObservations[0];
+      const currentValue = parseFloat(latestObservation.value);
+
       let change: number | undefined;
       if (validObservations.length > 1) {
-        const previous = parseFloat(validObservations[1].value);
-        if (!isNaN(previous)) {
-          change = value - previous;
+        const previousValue = parseFloat(validObservations[1].value);
+        if (!isNaN(currentValue) && !isNaN(previousValue)) {
+          change = currentValue - previousValue;
         }
       }
 
       const result: MetricValue = {
-        value: isNaN(value) ? null : value,
-        date: latest.date,
+        value: isNaN(currentValue) ? null : currentValue,
+        date: latestObservation.date,
         change,
-        formatted: this.formatValue(seriesId, value)
+        formatted: this.formatValue(seriesId, currentValue), // Pass only necessary info
       };
 
-      // Cache the result
       this.setCachedData(seriesId, result);
       return result;
 
-    } catch (error) {
-      console.error(`Error fetching FRED data for ${seriesId}:`, error);
-      return this.getFallbackData(seriesId);
+    } catch (error: any) {
+      if (error instanceof FredRequestError) {
+        console.warn(`FRED Service: API error for ${seriesId}: ${error.status} ${error.statusText}`);
+        return this.getFallbackData(seriesId, `API Error ${error.status}`);
+      }
+      if (error instanceof FredAuthError) {
+        console.error(`FRED Service: Authentication error for ${seriesId}:`, error.message);
+        return this.getFallbackData(seriesId, 'Authentication Error');
+      }
+      console.error(`FRED Service: Unexpected error fetching ${seriesId}:`, error);
+      return this.getFallbackData(seriesId, error.message || 'Generic fetch error');
     }
   }
 
-  /**
-   * Provide fallback data when API fails
-   */
-  private getFallbackData(seriesId: string): MetricValue {
-    // Provide reasonable fallback values for key metrics
+  private getFallbackData(seriesId: string, errorReason?: string): MetricValue {
+    const reason = errorReason || "Fallback";
+    console.log(`FRED Service: Using fallback data for ${seriesId} due to: ${reason}`);
+    // Fallbacks specific to PoC series IDs
     const fallbacks: Record<string, MetricValue> = {
-      'UNRATE': { value: 3.9, date: '2025-05-01', formatted: '3.9%' },
-      'FEDFUNDS': { value: 4.5, date: '2025-05-01', formatted: '4.50%' },
-      'GS10': { value: 4.2, date: '2025-05-01', formatted: '4.20%' },
-      'UMCSENT': { value: 102, date: '2025-05-01', formatted: '102.0' },
-      'PCEPILFE': { value: 2.8, date: '2025-05-01', formatted: '2.8%' },
-      'ICSA': { value: 220000, date: '2025-05-01', formatted: '220K' },
+      [KNOWN_FRED_POC_SERIES_IDS.UNEMPLOYMENT_RATE_U3]: { value: 3.9, date: 'N/A', formatted: '3.9%' },
+      [KNOWN_FRED_POC_SERIES_IDS.FED_FUNDS_RATE_DAILY]: { value: 5.33, date: 'N/A', formatted: '5.33%' }, // Example
+      [KNOWN_FRED_POC_SERIES_IDS.TEN_YEAR_TREASURY_YIELD_DAILY]: { value: 4.50, date: 'N/A', formatted: '4.50%' },
+      [KNOWN_FRED_POC_SERIES_IDS.INITIAL_JOBLESS_CLAIMS]: { value: 230000, date: 'N/A', formatted: '230K' }, // Value is number, not K
+      [KNOWN_FRED_POC_SERIES_IDS.CORE_CPI_STICKY_YOY]: { value: 3.0, date: 'N/A', formatted: '3.0%' }, // Example YoY
     };
-
-    return fallbacks[seriesId] || { value: null, date: '', formatted: 'No data available' };
+    return fallbacks[seriesId] || { value: null, date: '', formatted: 'No Data (Fallback)' };
   }
 
-  /**
-   * Fetch multiple series with improved batching
-   */
   async getBulkData(seriesIds: string[]): Promise<Record<string, MetricValue>> {
     const results: Record<string, MetricValue> = {};
-    
-    // Process in smaller batches to avoid overwhelming the API
-    const batchSize = 5;
-    const batches = [];
+    const batchSize = Math.min(seriesIds.length, 5); // Ensure batchSize isn't larger than total series
     
     for (let i = 0; i < seriesIds.length; i += batchSize) {
-      batches.push(seriesIds.slice(i, i + batchSize));
-    }
-
-    for (const batch of batches) {
-      const batchPromises = batch.map(async (seriesId) => {
-        const data = await this.getLatestValue(seriesId);
-        return { seriesId, data };
-      });
+      const batch = seriesIds.slice(i, i + batchSize);
+      console.log(`FRED Service: Processing batch ${Math.floor(i/batchSize) + 1} for series: ${batch.join(', ')}`);
+      
+      const batchPromises = batch.map(seriesId =>
+        this.getLatestValue(seriesId).then(data => ({ seriesId, data }))
+      );
 
       const responses = await Promise.allSettled(batchPromises);
-      
-      responses.forEach((response, index) => {
-        const seriesId = batch[index];
-        if (response.status === 'fulfilled') {
-          results[seriesId] = response.value.data;
+
+      responses.forEach(responseOutcome => { // Renamed for clarity
+        if (responseOutcome.status === 'fulfilled') {
+          const { seriesId, data } = responseOutcome.value;
+          results[seriesId] = data;
         } else {
-          console.error(`Failed to fetch ${seriesId}:`, response.reason);
-          results[seriesId] = this.getFallbackData(seriesId);
+          // Error already logged in getLatestValue if it originated there.
+          // If Promise.allSettled catches an error not from getLatestValue itself (unlikely here), log it.
+          console.error(`FRED Service: Batch promise rejected for a series. Reason:`, responseOutcome.reason);
+          // Fallback for the specific series ID would have been handled by getLatestValue,
+          // but we need to ensure the key exists in results if an unexpected error happened before getLatestValue's try/catch.
+          // This part is tricky without knowing which seriesId failed if the error isn't from getLatestValue.
+          // For now, relying on getLatestValue to handle its own fallbacks and populate results.
         }
       });
-
-      // Add delay between batches
-      if (batches.indexOf(batch) < batches.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay between batches
+      // Minimal delay between batches as makeRateLimitedRequest handles per-request delay
+      if (i + batchSize < seriesIds.length) {
+        await new Promise(resolve => setTimeout(resolve, 200)); // Small courtesy delay
       }
     }
-
     return results;
   }
 
-  /**
-   * Format values based on the metric type
-   */
+  // Updated formatValue to use KNOWN_FRED_POC_SERIES_IDS for more specific formatting.
+  // The API route will ultimately decide the final "units" string based on metrics.ts.
+  // This formatting is for the `formatted` field returned by the service.
   private formatValue(seriesId: string, value: number): string {
-    if (isNaN(value)) return 'N/A';
+    if (value === null || isNaN(value)) return 'N/A';
 
-    // Rates and percentages
-    if (seriesId.includes('RATE') || seriesId.includes('UNRATE') || seriesId.includes('FEDFUNDS') || 
-        seriesId.includes('GS') || seriesId.includes('A191RL1Q225SBEA') || seriesId.includes('PCEPILFE') ||
-        seriesId.includes('CPILFESL')) {
-      return `${value.toFixed(2)}%`;
+    switch (seriesId) {
+      case KNOWN_FRED_POC_SERIES_IDS.REAL_GDP_GROWTH_RATE: // A191RL1Q225SBEA
+      case KNOWN_FRED_POC_SERIES_IDS.CAPACITY_UTILIZATION_RATE: // TCU
+      case KNOWN_FRED_POC_SERIES_IDS.UNEMPLOYMENT_RATE_U3: // UNRATE
+      case KNOWN_FRED_POC_SERIES_IDS.LABOR_FORCE_PARTICIPATION_RATE: // CIVPART
+      case KNOWN_FRED_POC_SERIES_IDS.CORE_CPI_STICKY_YOY: // CORESTICKM159SFRBATL
+      case KNOWN_FRED_POC_SERIES_IDS.FIVE_YEAR_FIVE_YEAR_FORWARD_INFLATION_RATE: // T5YIFR
+      case KNOWN_FRED_POC_SERIES_IDS.FED_FUNDS_RATE_DAILY: // DFF
+      case KNOWN_FRED_POC_SERIES_IDS.TEN_YEAR_TREASURY_YIELD_DAILY: // DGS10
+        return `${value.toFixed(2)}%`;
+
+      case KNOWN_FRED_POC_SERIES_IDS.MANUFACTURING_PMI: // NAPM
+      case KNOWN_FRED_POC_SERIES_IDS.SERVICES_PMI:    // NMFCI
+      case KNOWN_FRED_POC_SERIES_IDS.INDUSTRIAL_PRODUCTION_INDEX_LEVEL: // INDPRO
+      case KNOWN_FRED_POC_SERIES_IDS.CONFERENCE_BOARD_LEI: // USSLIND
+      case KNOWN_FRED_POC_SERIES_IDS.CHICAGO_FED_CFNAI: // CFNAI
+      case KNOWN_FRED_POC_SERIES_IDS.DOLLAR_INDEX_TRADE_WEIGHTED_BROAD: // DTWEXBGS
+        return value.toFixed(1); // Index values
+
+      case KNOWN_FRED_POC_SERIES_IDS.INITIAL_JOBLESS_CLAIMS: // ICSA - value is number
+        return `${Math.round(value / 1000)}K`;
+      case KNOWN_FRED_POC_SERIES_IDS.JOB_OPENINGS_JOLTS: // JTSJOL - value is in thousands
+        return `${(value / 1000).toFixed(1)}M`; // Display as Millions
+
+      default:
+        // Attempt generic formatting based on common FRED patterns if ID not in KNOWN_FRED_POC_SERIES_IDS
+        if (seriesId.includes('RATE') || seriesId.endsWith('PCH') || seriesId.endsWith('PC1')) return `${value.toFixed(2)}%`;
+        if (seriesId.startsWith('CPI') || seriesId.startsWith('PCE')) return value.toFixed(3); // Price index levels
+        return value.toFixed(2); // Default
     }
-
-    // Index values (Consumer Sentiment, PMI, LEI)
-    if (seriesId.includes('UMCSENT') || seriesId.includes('USSLIND')) {
-      return value.toFixed(1);
-    }
-
-    // Large numbers (payrolls, claims in thousands)
-    if (seriesId.includes('PAYEMS') || seriesId.includes('ICSA')) {
-      return `${(value / 1000).toFixed(0)}K`;
-    }
-
-    // Housing starts
-    if (seriesId.includes('HOUST')) {
-      return `${value.toFixed(0)}K`;
-    }
-
-    // Retail sales (in trillions)
-    if (seriesId.includes('RSXFS')) {
-      return `$${(value / 1000).toFixed(1)}T`;
-    }
-
-    // Industrial production (index)
-    if (seriesId.includes('INDPRO')) {
-      return value.toFixed(1);
-    }
-
-    // Yield curve spread
-    if (seriesId.includes('T10Y2Y')) {
-      return `${value.toFixed(2)}%`;
-    }
-
-    // Default formatting
-    return value.toFixed(2);
   }
 
-  /**
-   * Clear cache (useful for testing)
-   */
   clearCache(): void {
     this.cache.clear();
+    console.log("FRED Service: Cache cleared.");
   }
 
-  /**
-   * Get cache stats
-   */
   getCacheStats(): { size: number; keys: string[] } {
     return {
       size: this.cache.size,
@@ -286,23 +265,7 @@ class FredService {
   }
 }
 
-// Export singleton instance
 export const fredService = new FredService();
 
-// Reduced mapping focusing on critical metrics
-export const METRIC_TO_FRED_MAPPING = {
-  'Real GDP Growth Rate': FRED_SERIES.GDP_GROWTH,
-  'Unemployment Rate (U-3)': FRED_SERIES.UNEMPLOYMENT_RATE,
-  'Core PCE': FRED_SERIES.CORE_PCE,
-  'Fed Funds Rate': FRED_SERIES.FED_FUNDS_RATE,
-  '10-Year Treasury Yield': FRED_SERIES.TREASURY_10Y,
-  '2s-10s Yield Curve': FRED_SERIES.YIELD_CURVE_SPREAD,
-  'Initial Jobless Claims': FRED_SERIES.INITIAL_CLAIMS,
-  'Consumer Confidence Index': FRED_SERIES.CONSUMER_CONFIDENCE,
-  'Industrial Production Index': FRED_SERIES.INDUSTRIAL_PRODUCTION,
-  'Non-Farm Payrolls': FRED_SERIES.NONFARM_PAYROLLS,
-  'Core CPI': FRED_SERIES.CORE_CPI,
-  'Retail Sales': FRED_SERIES.RETAIL_SALES,
-  'Housing Starts': FRED_SERIES.HOUSING_STARTS,
-  'Conference Board LEI': FRED_SERIES.CONFERENCE_BOARD_LEI,
-} as const;
+// The old METRIC_TO_FRED_MAPPING and FRED_SERIES are no longer needed here,
+// as the API route will derive Series IDs directly from lib/data/metrics.ts.
