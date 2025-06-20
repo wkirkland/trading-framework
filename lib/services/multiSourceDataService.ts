@@ -47,9 +47,11 @@ class MultiSourceDataService {
   private getMarketFallbackData(metricName: string, errorReason: string = "Fallback"): MetricValue {
     console.log(`AlphaVantage Service: Using fallback data for ${metricName} due to: ${errorReason}`);
     const fallbacks: Record<string, MetricValue> = {
-      'VIX Index': { value: 18.5, date: 'N/A', formatted: '18.5 (Fallback)', source: 'Fallback Data', change: 0 },
-      'S&P 500': { value: 4385, date: 'N/A', formatted: '$4,385 (Fallback)', source: 'Fallback Data', change: 0 },
-      'Consumer Confidence Index': { value: 100, date: 'N/A', formatted: '100.0 (Fallback)', source: 'Fallback Data', change: 0 }
+      'VIX Index': { value: 15.2, date: '2025-06-20', formatted: '15.2 (Fallback)', source: 'Fallback Data', change: -0.5 },
+      'S&P 500': { value: 5950, date: '2025-06-20', formatted: '$5,950 (Fallback)', source: 'Fallback Data', change: 25.3 },
+      'Dollar Index': { value: 105.8, date: '2025-06-20', formatted: '105.8 (Fallback)', source: 'Fallback Data', change: 0.2 },
+      'Gold Price': { value: 2340, date: '2025-06-20', formatted: '$2,340 (Fallback)', source: 'Fallback Data', change: -12.5 },
+      'Consumer Confidence Index': { value: 102.3, date: '2025-06-20', formatted: '102.3 (Fallback)', source: 'Fallback Data', change: 1.8 }
     };
     return fallbacks[metricName] || { value: null, date: '', formatted: 'No Data (Fallback)', source: 'Fallback Data' };
   }
