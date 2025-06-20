@@ -4,34 +4,22 @@ import { useSignalAnalysis } from '@/lib/hooks/useSignalAnalysis';
 
 const thesisOptions = [
   {
-    id: 'economic-transition',
-    description: 'Economy transitioning from old to new paradigm',
-    supportingFactors: ['GDP contraction', 'Structural shifts', 'Innovation acceleration'],
-    contradictingFactors: ['Consumer resilience', 'Policy support', 'Market recovery']
+    id: 'strong-growth-stable-inflation',
+    description: 'Strong economic growth with stable inflation near target',
+    supportingFactors: ['GDP growth 2.5-4%', 'Inflation 2-3%', 'Low unemployment', 'Positive sentiment'],
+    contradictingFactors: ['Economic contraction', 'High inflation', 'Labor market weakness']
   },
   {
-    id: 'soft-landing',
-    description: 'Growth slows without recession, inflation moderates',
-    supportingFactors: ['Labor market strength', 'Consumer spending', 'Fed gradualism'],
-    contradictingFactors: ['GDP contraction', 'Business investment decline', 'Credit tightening']
+    id: 'moderate-growth-with-headwinds',
+    description: 'Moderate growth facing various economic challenges',
+    supportingFactors: ['Steady but slow growth', 'Manageable inflation', 'Resilient consumers'],
+    contradictingFactors: ['Supply chain issues', 'Geopolitical tensions', 'Monetary tightening']
   },
   {
-    id: 'mild-recession',
-    description: 'Brief, shallow recession with quick recovery',
-    supportingFactors: ['GDP decline', 'Business pessimism', 'Yield curve inversion'],
-    contradictingFactors: ['Employment strength', 'Consumer confidence', 'Policy support']
-  },
-  {
-    id: 'stagflation',
-    description: 'Persistent inflation with weak economic growth',
-    supportingFactors: ['Supply chain disruptions', 'Wage-price spiral', 'Energy costs'],
-    contradictingFactors: ['Fed policy response', 'Demand destruction', 'Technology deflation']
-  },
-  {
-    id: 'reflation',
-    description: 'Economic recovery with rising inflation expectations',
-    supportingFactors: ['Fiscal stimulus', 'Monetary accommodation', 'Commodity demand'],
-    contradictingFactors: ['Central bank tightening', 'Debt constraints', 'Demographic headwinds']
+    id: 'recessionary-conditions',
+    description: 'Economic contraction with declining activity',
+    supportingFactors: ['GDP decline', 'Rising unemployment', 'Business pessimism', 'Credit tightening'],
+    contradictingFactors: ['Policy support', 'Consumer resilience', 'Market stability']
   }
 ];
 

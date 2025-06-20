@@ -38,7 +38,7 @@ const getNextUpdateEstimate = (metricName: string): string => {
 
 export function useSignalAnalysis() {
   const { loading, error, lastFetched, fetchData, getLiveValue } = useLiveData();
-  const [selectedThesis, setSelectedThesis] = useState<string>('economic-transition');
+  const [selectedThesis, setSelectedThesis] = useState<string>('strong-growth-stable-inflation');
 
   // Calculate evidence scores using POC analysis
   const evidenceScores = useMemo((): BasicEvidenceScores => {
