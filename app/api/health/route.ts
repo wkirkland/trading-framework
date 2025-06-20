@@ -3,7 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   const startTime = Date.now();
   
   try {
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Support HEAD requests for simple alive checks
-export async function HEAD(request: NextRequest) {
+export async function HEAD(_request: NextRequest) {
   try {
     return new NextResponse(null, { 
       status: 200,
@@ -73,7 +73,7 @@ export async function HEAD(request: NextRequest) {
         'Cache-Control': 'no-cache'
       }
     });
-  } catch (error) {
+  } catch (_error) {
     return new NextResponse(null, { status: 503 });
   }
 }

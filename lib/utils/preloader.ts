@@ -301,7 +301,7 @@ export function useSmartPreload(route: string) {
  * Preload components based on network conditions
  */
 export function preloadBasedOnNetwork() {
-  // @ts-ignore - navigator.connection might not be available in all browsers
+  // @ts-expect-error - navigator.connection might not be available in all browsers
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   
   if (!connection) {

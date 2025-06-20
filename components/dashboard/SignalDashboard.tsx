@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useSignalAnalysis } from '@/lib/hooks/useSignalAnalysis';
+
+import { GaugeChart } from '@/components/charts/GaugeChart';
 import { MetricGrid } from '@/components/metrics/MetricGrid';
 import { MetricTable } from '@/components/metrics/MetricTable';
-import { GaugeChart } from '@/components/charts/GaugeChart';
 import type { MetricCardData } from '@/components/metrics/MetricCard';
+import { useSignalAnalysis } from '@/lib/hooks/useSignalAnalysis';
 
 const thesisOptions = [
   {
@@ -45,35 +46,6 @@ export default function SignalDashboard() {
   // View toggle state
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
-  const getEvidenceBarStyle = (score: number) => {
-    const percentage = Math.max(10, Math.min(90, 50 + (score * 20)));
-    const color = score > 1 ? '#10b981' : score > 0 ? '#f59e0b' : score > -1 ? '#ef4444' : '#dc2626';
-    return {
-      width: `${percentage}%`,
-      background: `linear-gradient(90deg, ${color}, ${color}dd)`,
-      height: '100%',
-      borderRadius: '0.75rem',
-      transition: 'width 0.3s ease'
-    };
-  };
-
-  const getSignalClass = (signal: string) => {
-    switch (signal) {
-      case 'confirm': return 'signal-pill confirm';
-      case 'contradict': return 'signal-pill contradict';
-      case 'neutral': return 'signal-pill neutral';
-      default: return 'signal-pill neutral';
-    }
-  };
-
-  const getImpactClass = (impact: string) => {
-    switch (impact) {
-      case 'high': return 'impact-high';
-      case 'medium': return 'impact-medium';
-      case 'low': return 'impact-low';
-      default: return 'impact-low';
-    }
-  };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -101,7 +73,7 @@ export default function SignalDashboard() {
     category: 'economic', // Default category for now
     isLive: metric.value !== null && metric.value !== undefined,
     // Generate sample sparkline data (in real implementation, this would come from historical data)
-    sparklineData: Array.from({ length: 7 }, (_, i) => 
+    sparklineData: Array.from({ length: 7 }, () => 
       metric.value !== null ? metric.value + (Math.random() - 0.5) * (metric.value * 0.1) : 0
     )
   }));

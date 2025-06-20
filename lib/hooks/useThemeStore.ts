@@ -111,7 +111,7 @@ export function useThemeStore(): ThemeStore {
       mediaQuery.addEventListener('change', handleChange);
       return () => mediaQuery.removeEventListener('change', handleChange);
     } else {
-      // @ts-ignore - fallback for older browsers
+      // @ts-expect-error - fallback for older browsers
       mediaQuery.addListener(handleChange);
       return () => mediaQuery.removeListener(handleChange);
     }

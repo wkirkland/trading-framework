@@ -41,7 +41,6 @@ export function MetricCard({
     signal,
     impact,
     change,
-    changeValue,
     reasoning,
     nextUpdate,
     category,

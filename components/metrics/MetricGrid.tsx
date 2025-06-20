@@ -2,8 +2,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { MetricCard, type MetricCardData } from './MetricCard';
+
 import { AnnouncementRegion } from '@/components/ui/LiveRegion';
+import { MetricCard, type MetricCardData } from './MetricCard';
 
 interface MetricGridProps {
   metrics: MetricCardData[];
@@ -30,6 +31,44 @@ export function MetricGrid({
   loading = false,
   error
 }: MetricGridProps) {
+  // Get stats for the header (must be at top before any early returns)
+  const liveCount = metrics.filter(m => m.isLive).length;
+  const confirmCount = metrics.filter(m => m.signal === 'confirm').length;
+  const contradictCount = metrics.filter(m => m.signal === 'contradict').length;
+  const neutralCount = metrics.filter(m => m.signal === 'neutral').length;
+
+  // Track changes for announcements (hooks must be at top)
+  const [previousStats, setPreviousStats] = useState({ confirmCount, contradictCount, neutralCount, liveCount });
+  const [announcement, setAnnouncement] = useState('');
+
+  useEffect(() => {
+    const statsChanged = 
+      confirmCount !== previousStats.confirmCount ||
+      contradictCount !== previousStats.contradictCount ||
+      neutralCount !== previousStats.neutralCount ||
+      liveCount !== previousStats.liveCount;
+
+    if (statsChanged) {
+      const changes = [];
+      if (confirmCount !== previousStats.confirmCount) {
+        changes.push(`${confirmCount} confirming signals`);
+      }
+      if (contradictCount !== previousStats.contradictCount) {
+        changes.push(`${contradictCount} contradicting signals`);
+      }
+      if (neutralCount !== previousStats.neutralCount) {
+        changes.push(`${neutralCount} neutral signals`);
+      }
+      if (liveCount !== previousStats.liveCount) {
+        changes.push(`${liveCount} live metrics`);
+      }
+      
+      if (changes.length > 0) {
+        setAnnouncement(`Metrics updated: ${changes.join(', ')}`);
+        setPreviousStats({ confirmCount, contradictCount, neutralCount, liveCount });
+      }
+    }
+  }, [confirmCount, contradictCount, neutralCount, liveCount, previousStats]);
   
   // Loading skeleton
   if (loading) {
@@ -112,49 +151,6 @@ export function MetricGrid({
       </div>
     );
   }
-
-  // Get stats for the header
-  const liveCount = metrics.filter(m => m.isLive).length;
-  const confirmCount = metrics.filter(m => m.signal === 'confirm').length;
-  const contradictCount = metrics.filter(m => m.signal === 'contradict').length;
-  const neutralCount = metrics.filter(m => m.signal === 'neutral').length;
-
-  // Track changes for announcements
-  const [previousStats, setPreviousStats] = useState({ confirmCount, contradictCount, neutralCount, liveCount });
-  const [announcement, setAnnouncement] = useState('');
-
-  useEffect(() => {
-    const statsChanged = 
-      confirmCount !== previousStats.confirmCount ||
-      contradictCount !== previousStats.contradictCount ||
-      neutralCount !== previousStats.neutralCount ||
-      liveCount !== previousStats.liveCount;
-
-    if (statsChanged) {
-      const changes = [];
-      
-      if (confirmCount !== previousStats.confirmCount) {
-        const direction = confirmCount > previousStats.confirmCount ? 'increased' : 'decreased';
-        changes.push(`Confirming signals ${direction} to ${confirmCount}`);
-      }
-      
-      if (contradictCount !== previousStats.contradictCount) {
-        const direction = contradictCount > previousStats.contradictCount ? 'increased' : 'decreased';
-        changes.push(`Contradicting signals ${direction} to ${contradictCount}`);
-      }
-      
-      if (liveCount !== previousStats.liveCount) {
-        const direction = liveCount > previousStats.liveCount ? 'increased' : 'decreased';
-        changes.push(`Live data sources ${direction} to ${liveCount}`);
-      }
-
-      if (changes.length > 0) {
-        setAnnouncement(`Economic indicators updated: ${changes.join(', ')}`);
-      }
-
-      setPreviousStats({ confirmCount, contradictCount, neutralCount, liveCount });
-    }
-  }, [confirmCount, contradictCount, neutralCount, liveCount, previousStats]);
 
   return (
     <div className={`metric-grid-container ${className}`}>
