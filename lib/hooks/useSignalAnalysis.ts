@@ -9,7 +9,7 @@ import {
   PocAnalysisOutput,            // Type for the output of the new function
   PocMetricAnalysisDetail,      // Type for detailed metric analysis
   // GetLiveValueFunction,    // Already available via useLiveData
-} from '@/lib/utils/analysisUtils'; // Assuming correct path
+} from '@/lib/analysis'; // Updated to use new analysis module
 // Note: We might not need to import GetLiveValueFunction type explicitly if useLiveData provides it typed.
 
 // Define a type for the key metrics our UI will consume for the PoC

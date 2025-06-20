@@ -9,14 +9,14 @@ import {
   generateEnhancedKeyMetrics,
   generateEnhancedConflictAlerts,
   evaluateEnhancedThresholdTriggers // NEW IMPORT
-} from '@/lib/utils/analysisUtils';
+} from '@/lib/analysis';
 import type {
   EvidenceScores,
   MarketIndicators,
   SignalData,
   ConflictAlert,
   ThresholdTrigger // NEW IMPORT FOR TYPE
-} from '@/lib/utils/analysisUtils';
+} from '@/lib/analysis';
 
 // All local interface definitions (SignalData, MarketIndicators, EvidenceScores, ConflictAlert, ThresholdTrigger)
 // can now be removed from this file as they are imported from analysisUtils.ts (or should be if they aren't already)
