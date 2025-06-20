@@ -66,7 +66,7 @@ export function useSignalAnalysis() {
         environmental: 0,
         overall: overallScore,
       };
-    } catch (error) {
+    } catch {
       return {
         economic: 0,
         political: 0,
@@ -119,7 +119,7 @@ export function useSignalAnalysis() {
           nextUpdate: getNextUpdateEstimate(detail.name),
         };
       });
-    } catch (error) {
+    } catch {
       return [];
     }
   }, [selectedThesis, loading, getLiveValue]);

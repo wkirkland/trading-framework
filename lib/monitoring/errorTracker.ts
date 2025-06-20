@@ -338,7 +338,7 @@ export function withErrorTracking<T>(
   component: string,
   operation: string,
   fn: () => T,
-  metadata?: Record<string, any>
+  _metadata?: Record<string, any>
 ): T {
   try {
     return fn();
@@ -354,7 +354,7 @@ export async function withAsyncErrorTracking<T>(
   component: string,
   operation: string,
   fn: () => Promise<T>,
-  metadata?: Record<string, any>
+  _metadata?: Record<string, any>
 ): Promise<T> {
   try {
     return await fn();
