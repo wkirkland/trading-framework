@@ -67,13 +67,13 @@ export async function GET(_request: NextRequest) {
 // Support HEAD requests for simple alive checks
 export async function HEAD(_request: NextRequest) {
   try {
-    return new NextResponse(null, { 
+    return new Response(null, { 
       status: 200,
       headers: {
         'Cache-Control': 'no-cache'
       }
     });
   } catch {
-    return new NextResponse(null, { status: 503 });
+    return new Response(null, { status: 503 });
   }
 }
