@@ -2,6 +2,7 @@
 'use client';
 
 import React, { Suspense as ReactSuspense } from 'react';
+
 import { Skeleton } from './Skeleton';
 
 export interface SuspenseWrapperProps {

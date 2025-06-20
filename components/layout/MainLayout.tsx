@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+
 import Sidebar from './Sidebar';
 
 interface MainLayoutProps {

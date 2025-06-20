@@ -73,7 +73,7 @@ export async function HEAD(_request: NextRequest) {
         'Cache-Control': 'no-cache'
       }
     });
-  } catch (_error) {
+  } catch {
     return new NextResponse(null, { status: 503 });
   }
 }

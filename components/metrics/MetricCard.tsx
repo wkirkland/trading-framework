@@ -2,6 +2,7 @@
 'use client';
 
 import React from 'react';
+
 import { MetricTooltip } from '@/components/ui/Tooltip';
 
 export interface MetricCardData {

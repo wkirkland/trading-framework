@@ -2,6 +2,7 @@
 'use client';
 
 import React, { lazy } from 'react';
+
 import { 
   SuspenseWrapper, 
   MetricCardSuspense,

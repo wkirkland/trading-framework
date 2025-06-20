@@ -2,6 +2,7 @@
 'use client';
 
 import React from 'react';
+
 import { DataTable, type TableColumn } from '@/components/table/DataTable';
 import { MetricTooltip } from '@/components/ui/Tooltip';
 import type { SignalData } from '@/lib/hooks/useSignalAnalysis';
