@@ -55,6 +55,13 @@ export {
 
 // --- CONVENIENCE FUNCTIONS ---
 
+// Import functions for use in convenience functions
+import { calculateEnhancedEvidenceScores, calculateBasicEvidenceScores } from './scoring/evidenceScoring';
+import { generateEnhancedKeyMetrics, generateBasicKeyMetrics } from './signals/signalGeneration';
+import { generateEnhancedConflictAlerts } from './alerts/conflictDetection';
+import { evaluateEnhancedThresholdTriggers } from './alerts/thresholdTriggers';
+import { calculatePocWeightOfEvidence } from './scoring/pocAnalysis';
+
 /**
  * Complete analysis pipeline - generates all analysis outputs
  */
