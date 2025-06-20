@@ -21,12 +21,12 @@ beforeAll(async () => {
   const config = getIntegrationConfig();
   
   // Override environment variables for testing
-  process.env.NODE_ENV = 'integration';
-  process.env.FRED_API_KEY = config.fredApiKey;
-  process.env.FRED_BASE_URL = config.fredBaseUrl;
+  (process.env as any).NODE_ENV = 'integration';
+  (process.env as any).FRED_API_KEY = config.fredApiKey;
+  (process.env as any).FRED_BASE_URL = config.fredBaseUrl;
   
   if (config.alphaVantageApiKey) {
-    process.env.ALPHA_VANTAGE_API_KEY = config.alphaVantageApiKey;
+    (process.env as any).ALPHA_VANTAGE_API_KEY = config.alphaVantageApiKey;
   }
   
   console.log('✅ Integration test environment configured');
