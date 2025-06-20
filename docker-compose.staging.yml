@@ -1,0 +1,92 @@
+# docker-compose.staging.yml
+# Staging environment deployment for validation testing
+
+version: '3.8'
+
+services:
+  trading-framework-staging:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: production-ready
+    container_name: trading-framework-staging
+    ports:
+      - "3001:3000"  # Staging port
+    environment:
+      - NODE_ENV=staging
+      - PORT=3000
+      - FRED_API_KEY=${FRED_API_KEY}
+      - ALPHA_VANTAGE_API_KEY=${ALPHA_VANTAGE_API_KEY:-}
+    env_file:
+      - .env.integration.local
+    volumes:
+      # Mount source code for development (remove in production)
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - staging-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "com.trading-framework.environment=staging"
+      - "com.trading-framework.version=${VERSION:-latest}"
+
+  # Staging monitoring (optional)
+  staging-monitor:
+    image: nginx:alpine
+    container_name: staging-monitor
+    ports:
+      - "8080:80"
+    volumes:
+      - ./monitoring/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - trading-framework-staging
+    networks:
+      - staging-network
+    restart: unless-stopped
+    labels:
+      - "com.trading-framework.service=monitor"
+
+  # Test runner service
+  staging-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: test-runner
+    container_name: staging-tests
+    environment:
+      - NODE_ENV=integration
+      - TEST_BASE_URL=http://trading-framework-staging:3000
+      - STAGING_TEST_MODE=true
+      - FRED_API_KEY=${FRED_API_KEY}
+      - ALPHA_VANTAGE_API_KEY=${ALPHA_VANTAGE_API_KEY:-}
+    env_file:
+      - .env.integration.local
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - staging-network
+    depends_on:
+      - trading-framework-staging
+    command: ["npm", "run", "test:integration", "--", "tests/integration/deploymentValidation.integration.test.ts"]
+    labels:
+      - "com.trading-framework.service=tests"
+
+networks:
+  staging-network:
+    driver: bridge
+    labels:
+      - "com.trading-framework.network=staging"
+
+volumes:
+  staging-data:
+    driver: local
+    labels:
+      - "com.trading-framework.data=staging"

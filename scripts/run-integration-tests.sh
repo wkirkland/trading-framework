@@ -107,6 +107,7 @@ test_categories=(
     "Security Integration:tests/integration/security.integration.test.ts"
     "Health Check System:tests/integration/healthCheck.integration.test.ts"
     "Health API Endpoints:tests/integration/healthEndpoints.integration.test.ts"
+    "Deployment Validation:tests/integration/deploymentValidation.integration.test.ts"
 )
 
 total_categories=${#test_categories[@]}
@@ -146,15 +147,16 @@ if [ $failed_categories -eq 0 ]; then
     echo "✅ Security: No vulnerabilities detected"
     echo "✅ Health Checks: Monitoring system operational"
     echo "✅ API Endpoints: Production-ready"
+    echo "✅ Deployment Validation: Production readiness confirmed"
     echo "✅ Performance: Meeting baselines"
     echo "✅ Data Quality: Validated"
     echo ""
     echo -e "${GREEN}🚀 Security refactor validation COMPLETE${NC}"
     echo ""
     echo "Next steps:"
-    echo "1. Run deployment verification: ./scripts/deploy-verify.sh"
-    echo "2. Update production environment"
-    echo "3. Deploy to staging for final validation"
+    echo "1. Run staging deployment verification: ./scripts/staging-deploy-verify.sh"
+    echo "2. Deploy to production environment"
+    echo "3. Monitor production deployment health"
     
     exit 0
 else

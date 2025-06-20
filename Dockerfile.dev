@@ -1,12 +1,22 @@
-# Development Dockerfile for Trading Framework
-FROM node:18-alpine
+# Multi-stage Dockerfile for Trading Framework
+FROM node:18-alpine AS base
 
-# Set working directory
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat curl
 WORKDIR /app
 
-# Install dependencies for better caching
-COPY package*.json ./
-RUN npm ci --only=development
+# Install dependencies based on the preferred package manager
+COPY package.json package-lock.json* ./
+RUN npm ci --only=production && npm cache clean --force
+
+# Development stage
+FROM base AS development
+WORKDIR /app
+
+# Install all dependencies (including devDependencies)
+COPY package.json package-lock.json* ./
+RUN npm ci
 
 # Copy source code
 COPY . .
@@ -14,8 +24,6 @@ COPY . .
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
-
-# Change ownership of the app directory
 RUN chown -R nextjs:nodejs /app
 USER nextjs
 
@@ -24,3 +32,61 @@ EXPOSE 3000
 
 # Development command with hot reload
 CMD ["npm", "run", "dev"]
+
+# Build stage
+FROM base AS builder
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Production stage
+FROM base AS production-ready
+WORKDIR /app
+
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+
+# Copy built application
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Copy production dependencies
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+
+# Install curl for health checks
+RUN apk add --no-cache curl
+
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT 3000
+ENV NODE_ENV production
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/api/health || exit 1
+
+CMD ["npm", "start"]
+
+# Test runner stage
+FROM development AS test-runner
+WORKDIR /app
+
+# Install additional test dependencies
+RUN npm ci
+
+# Copy test files
+COPY tests/ ./tests/
+COPY jest.config.js jest.integration.config.js ./
+
+USER nextjs
+
+CMD ["npm", "run", "test:integration"]
