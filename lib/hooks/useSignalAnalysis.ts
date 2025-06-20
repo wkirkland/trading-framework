@@ -59,7 +59,7 @@ export function useSignalAnalysis() {
     }
 
     // Call the new PoC-specific calculation function
-    const { totalWeightedScore, metricDetails }: PocAnalysisOutput = calculatePocWeightOfEvidence(
+    const { overallScore, metricDetails }: PocAnalysisOutput = calculatePocWeightOfEvidence(
       selectedThesis,
       THESIS_SCORING_RULES, // Pass the imported PoC rules
       getLiveValue
@@ -98,7 +98,7 @@ export function useSignalAnalysis() {
     );
 
     return {
-      weightOfEvidence: totalWeightedScore,
+      weightOfEvidence: overallScore,
       keyMetricsForUI: formattedKeyMetrics,
     };
   }, [selectedThesis, loading, getLiveValue]); // Add other relevant dependencies from useLiveData if they affect values used
