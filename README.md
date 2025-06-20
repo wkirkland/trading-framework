@@ -621,6 +621,39 @@ Current integration test suite includes **5 test categories** with **50+ test sc
 - Bulk operations: <15 seconds
 - Concurrent requests: Efficient scaling
 
+### Staging Deployment Verification
+
+The system includes comprehensive staging deployment verification for production readiness validation:
+
+```bash
+# Run staging deployment verification
+./scripts/staging-deploy-verify.sh
+
+# Run with custom configuration
+STAGING_PORT=3001 STAGING_URL=http://localhost:3001 ./scripts/staging-deploy-verify.sh
+```
+
+**Staging Verification Features:**
+- ✅ **8-Gate Validation Process**: Prerequisites, environment, build, functionality, security, performance, integration, load testing
+- ✅ **Docker Staging Environment**: Multi-stage builds with production-ready target
+- ✅ **Production Readiness Tests**: Startup sequence, load patterns, error handling, memory pressure
+- ✅ **Security Validation**: API key exposure prevention, injection attack protection
+- ✅ **Performance Benchmarking**: Response times, concurrent request handling, load testing
+- ✅ **Health Monitoring**: Real-time monitoring system validation in staging environment
+
+#### Docker Staging Environment
+
+```bash
+# Start staging environment
+docker-compose -f docker-compose.staging.yml up -d
+
+# Run staging tests
+docker-compose -f docker-compose.staging.yml run staging-tests
+
+# View staging logs
+docker-compose -f docker-compose.staging.yml logs -f trading-framework-staging
+```
+
 ### Health Check & Monitoring APIs
 
 The system includes production-ready health check endpoints for monitoring and deployment:
