@@ -7,6 +7,15 @@ declare module 'next' {
     description?: string;
     [key: string]: any;
   }
+  
+  export interface NextConfig {
+    env?: Record<string, string>;
+    images?: Record<string, any>;
+    experimental?: Record<string, any>;
+    eslint?: Record<string, any>;
+    typescript?: Record<string, any>;
+    [key: string]: any;
+  }
 }
 
 declare module 'next/server' {
