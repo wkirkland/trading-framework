@@ -76,13 +76,8 @@ export function useSignalAnalysis() {
           else changeStr = '→ 0.00';
         }
 
-        // Basic reasoning for PoC
-        let reasoning = `Value: ${detail.currentValue !== null ? detail.currentValue.toFixed(2) : 'N/A'}. Signal: ${detail.signal}. Matched: ${detail.matchedRuleCondition || 'N/A'}`;
-        if (detail.signal === 'no_data') {
-            reasoning = 'No live data available for this metric.';
-        } else if (detail.signal === 'neutral_no_match'){
-            reasoning = `Live value ${detail.currentValue !== null ? detail.currentValue.toFixed(2) : 'N/A'} did not match specific rules; considered neutral.`;
-        }
+        // Use reasoning from the POC analysis detail
+        const reasoning = detail.reasoning || `Value: ${detail.currentValue !== null ? detail.currentValue.toFixed(2) : 'N/A'}. Signal: ${detail.signal}.`;
 
 
         return {
