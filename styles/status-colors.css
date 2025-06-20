@@ -1,0 +1,288 @@
+/* styles/status-colors.css */
+/* Semantic status color utility classes */
+/* Uses CSS custom properties from theme.css for automatic light/dark mode support */
+
+/* Confirm/Success Status Colors (Green) */
+.status-confirm {
+  background-color: var(--status-confirm-bg);
+  color: var(--status-confirm-text);
+  border-color: var(--status-confirm-border);
+}
+
+.status-confirm:hover {
+  background-color: var(--status-confirm-hover);
+}
+
+.status-confirm-solid {
+  background-color: var(--status-confirm-solid);
+  color: white;
+}
+
+.status-confirm-text {
+  color: var(--status-confirm-text);
+}
+
+.status-confirm-bg {
+  background-color: var(--status-confirm-bg);
+}
+
+.status-confirm-border {
+  border-color: var(--status-confirm-border);
+}
+
+/* Contradict/Error Status Colors (Red) */
+.status-contradict {
+  background-color: var(--status-contradict-bg);
+  color: var(--status-contradict-text);
+  border-color: var(--status-contradict-border);
+}
+
+.status-contradict:hover {
+  background-color: var(--status-contradict-hover);
+}
+
+.status-contradict-solid {
+  background-color: var(--status-contradict-solid);
+  color: white;
+}
+
+.status-contradict-text {
+  color: var(--status-contradict-text);
+}
+
+.status-contradict-bg {
+  background-color: var(--status-contradict-bg);
+}
+
+.status-contradict-border {
+  border-color: var(--status-contradict-border);
+}
+
+/* Neutral/Warning Status Colors (Amber) */
+.status-neutral {
+  background-color: var(--status-neutral-bg);
+  color: var(--status-neutral-text);
+  border-color: var(--status-neutral-border);
+}
+
+.status-neutral:hover {
+  background-color: var(--status-neutral-hover);
+}
+
+.status-neutral-solid {
+  background-color: var(--status-neutral-solid);
+  color: white;
+}
+
+.status-neutral-text {
+  color: var(--status-neutral-text);
+}
+
+.status-neutral-bg {
+  background-color: var(--status-neutral-bg);
+}
+
+.status-neutral-border {
+  border-color: var(--status-neutral-border);
+}
+
+/* Status Pills/Badges - Combined styling */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  border: 1px solid transparent;
+  transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.status-pill.confirm {
+  @apply status-confirm;
+}
+
+.status-pill.contradict {
+  @apply status-contradict;
+}
+
+.status-pill.neutral {
+  @apply status-neutral;
+}
+
+/* Icon + Text combinations */
+.status-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1-5);
+}
+
+.status-with-icon .status-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* Thesis Alignment Status - Maps to our signal types */
+.thesis-alignment-supports {
+  @apply status-confirm-text;
+  font-weight: var(--font-weight-semibold);
+}
+
+.thesis-alignment-contradicts {
+  @apply status-contradict-text;
+  font-weight: var(--font-weight-semibold);
+}
+
+.thesis-alignment-neutral {
+  @apply status-neutral-text;
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Signal Classification Pills - Used in dashboard tables */
+.signal-pill {
+  @apply status-pill;
+  min-width: 4rem;
+  text-align: center;
+  justify-content: center;
+}
+
+.signal-pill.confirm {
+  @apply status-confirm;
+}
+
+.signal-pill.contradict {
+  @apply status-contradict;
+}
+
+.signal-pill.neutral {
+  @apply status-neutral;
+}
+
+/* Data Trend Colors - For positive/negative/neutral data values */
+.data-positive {
+  color: var(--color-data-positive);
+}
+
+.data-negative {
+  color: var(--color-data-negative);
+}
+
+.data-neutral {
+  color: var(--color-data-neutral);
+}
+
+/* Background variants for data trends */
+.data-positive-bg {
+  background-color: var(--status-confirm-bg);
+  color: var(--status-confirm-text);
+}
+
+.data-negative-bg {
+  background-color: var(--status-contradict-bg);
+  color: var(--status-contradict-text);
+}
+
+.data-neutral-bg {
+  background-color: var(--status-neutral-bg);
+  color: var(--status-neutral-text);
+}
+
+/* Impact Weight Indicators - High/Medium/Low */
+.impact-high {
+  background-color: var(--status-contradict-solid);
+  color: white;
+  @apply status-pill;
+}
+
+.impact-medium {
+  background-color: var(--status-neutral-solid);
+  color: white;
+  @apply status-pill;
+}
+
+.impact-low {
+  background-color: var(--color-neutral-500);
+  color: white;
+  @apply status-pill;
+}
+
+/* Alert/Conflict Status Colors */
+.alert-high {
+  background-color: var(--status-contradict-bg);
+  color: var(--status-contradict-text);
+  border-left: 4px solid var(--status-contradict-solid);
+}
+
+.alert-medium {
+  background-color: var(--status-neutral-bg);
+  color: var(--status-neutral-text);
+  border-left: 4px solid var(--status-neutral-solid);
+}
+
+.alert-low {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-700);
+  border-left: 4px solid var(--color-neutral-400);
+}
+
+/* Loading/Status Indicators */
+.status-loading {
+  background-color: var(--color-neutral-200);
+  color: var(--color-neutral-600);
+}
+
+.status-success {
+  @apply status-confirm;
+}
+
+.status-error {
+  @apply status-contradict;
+}
+
+.status-warning {
+  @apply status-neutral;
+}
+
+/* Accessibility enhancements */
+@media (forced-colors: active) {
+  .status-confirm,
+  .status-contradict,
+  .status-neutral {
+    border: 2px solid;
+  }
+  
+  .status-pill {
+    border: 2px solid;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .status-confirm {
+    border-width: 2px;
+    border-style: solid;
+  }
+  
+  .status-contradict {
+    border-width: 2px;
+    border-style: solid;
+  }
+  
+  .status-neutral {
+    border-width: 2px;
+    border-style: solid;
+  }
+}
+
+/* Print styles */
+@media print {
+  .status-confirm,
+  .status-contradict,
+  .status-neutral {
+    border: 2px solid currentColor !important;
+    background: transparent !important;
+  }
+}

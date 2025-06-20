@@ -1,0 +1,317 @@
+/* styles/gauge-chart.css */
+/* Custom SVG gauge chart component styles */
+/* Uses design tokens for theming and animations */
+
+.gauge-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.gauge-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-900);
+  margin: 0;
+  text-align: center;
+}
+
+.gauge-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-600);
+  margin: 0;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.gauge-container {
+  position: relative;
+  display: inline-block;
+}
+
+.gauge-svg {
+  display: block;
+  overflow: visible;
+}
+
+/* Gauge background */
+.gauge-background {
+  stroke: var(--color-neutral-200);
+  transition: stroke var(--duration-fast) var(--ease-standard);
+}
+
+:root.dark .gauge-background {
+  stroke: var(--color-neutral-700);
+}
+
+/* Gauge segments */
+.gauge-segment {
+  opacity: 0.8;
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.gauge-segment:hover {
+  opacity: 1;
+}
+
+/* Labels and text */
+.gauge-label {
+  font-family: var(--font-family-sans);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  fill: var(--color-neutral-600);
+  transition: fill var(--duration-fast) var(--ease-standard);
+  user-select: none;
+}
+
+.gauge-scale-number {
+  font-family: var(--font-family-sans);
+  font-size: 10px;
+  font-weight: var(--font-weight-normal);
+  fill: var(--color-neutral-500);
+  transition: fill var(--duration-fast) var(--ease-standard);
+  user-select: none;
+}
+
+/* Scale ticks */
+.gauge-tick {
+  stroke: var(--color-neutral-400);
+  transition: stroke var(--duration-fast) var(--ease-standard);
+}
+
+:root.dark .gauge-tick {
+  stroke: var(--color-neutral-600);
+}
+
+/* Needle */
+.gauge-needle {
+  stroke-linecap: round;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  transition: all var(--duration-normal) var(--ease-standard);
+}
+
+/* Center dot */
+.gauge-center {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  transition: fill var(--duration-normal) var(--ease-standard);
+}
+
+/* Value display */
+.gauge-value-display {
+  pointer-events: none;
+  user-select: none;
+}
+
+.gauge-value {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  transition: color var(--duration-normal) var(--ease-standard);
+  line-height: 1;
+}
+
+.gauge-value-label {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-600);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  margin-top: var(--spacing-1);
+}
+
+/* Responsive sizing */
+.gauge-chart.small .gauge-title {
+  font-size: var(--font-size-lg);
+}
+
+.gauge-chart.small .gauge-subtitle {
+  font-size: var(--font-size-xs);
+}
+
+.gauge-chart.small .gauge-value {
+  font-size: var(--font-size-xl);
+}
+
+.gauge-chart.large .gauge-title {
+  font-size: var(--font-size-3xl);
+}
+
+.gauge-chart.large .gauge-subtitle {
+  font-size: var(--font-size-base);
+}
+
+.gauge-chart.large .gauge-value {
+  font-size: var(--font-size-4xl);
+}
+
+/* Animation for needle movement */
+@keyframes needleSweep {
+  from {
+    transform: rotate(-135deg);
+  }
+  to {
+    transform: rotate(var(--needle-angle, 0deg));
+  }
+}
+
+.gauge-needle.animated {
+  animation: needleSweep var(--duration-slow) var(--ease-standard);
+}
+
+/* Interactive states */
+.gauge-chart.interactive {
+  cursor: pointer;
+}
+
+.gauge-chart.interactive:hover .gauge-segment {
+  opacity: 1;
+}
+
+.gauge-chart.interactive:hover .gauge-needle {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+/* Status-specific styling */
+.gauge-chart.status-positive .gauge-value {
+  color: var(--status-confirm-text);
+}
+
+.gauge-chart.status-negative .gauge-value {
+  color: var(--status-contradict-text);
+}
+
+.gauge-chart.status-neutral .gauge-value {
+  color: var(--status-neutral-text);
+}
+
+/* Container card styling */
+.gauge-card {
+  background-color: var(--color-surface-primary);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-elevation-1);
+  transition: all var(--duration-fast) var(--ease-standard);
+}
+
+:root.dark .gauge-card {
+  border-color: var(--color-neutral-700);
+}
+
+.gauge-card:hover {
+  box-shadow: var(--shadow-elevation-2);
+  transform: var(--transform-hover-elevate);
+}
+
+/* Multiple gauge layout */
+.gauge-grid {
+  display: grid;
+  gap: var(--spacing-6);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  align-items: start;
+}
+
+.gauge-grid.compact {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-4);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .gauge-chart {
+    gap: var(--spacing-3);
+  }
+  
+  .gauge-title {
+    font-size: var(--font-size-lg);
+  }
+  
+  .gauge-subtitle {
+    font-size: var(--font-size-xs);
+  }
+  
+  .gauge-value {
+    font-size: var(--font-size-xl);
+  }
+  
+  .gauge-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--spacing-4);
+  }
+}
+
+@media (max-width: 480px) {
+  .gauge-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .gauge-card {
+    padding: var(--spacing-4);
+  }
+}
+
+/* Accessibility improvements */
+.gauge-chart[role="img"] {
+  /* Add ARIA label for screen readers */
+}
+
+.gauge-svg {
+  /* Ensure SVG is accessible */
+  role: "img";
+  aria-hidden: "false";
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gauge-needle,
+  .gauge-center,
+  .gauge-segment {
+    transition: none;
+    animation: none;
+  }
+  
+  .gauge-needle.animated {
+    animation: none;
+  }
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  .gauge-segment {
+    stroke: CanvasText;
+    stroke-width: 2px;
+  }
+  
+  .gauge-needle {
+    stroke: Highlight;
+    stroke-width: 4px;
+  }
+  
+  .gauge-center {
+    fill: Highlight;
+    stroke: CanvasText;
+    stroke-width: 2px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .gauge-chart {
+    break-inside: avoid;
+  }
+  
+  .gauge-segment {
+    opacity: 1;
+  }
+  
+  .gauge-needle,
+  .gauge-center {
+    filter: none;
+  }
+  
+  .gauge-card {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+}

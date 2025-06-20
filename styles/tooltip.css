@@ -1,0 +1,415 @@
+/* styles/tooltip.css */
+/* Tooltip component styles with ARIA compliance and positioning */
+
+/* Z-index layering */
+:root {
+  --z-tooltip: 9999;
+}
+
+/* Base tooltip container */
+.tooltip {
+  position: fixed;
+  z-index: var(--z-tooltip);
+  padding: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-elevation-4);
+  background: transparent;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity var(--duration-fast) var(--ease-standard),
+              transform var(--duration-fast) var(--ease-standard);
+}
+
+.tooltip.visible {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.tooltip.interactive {
+  pointer-events: auto;
+}
+
+/* Tooltip content wrapper */
+.tooltip-content {
+  background-color: var(--color-neutral-900);
+  color: var(--color-neutral-50);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  max-width: 100%;
+  word-wrap: break-word;
+  box-shadow: var(--shadow-elevation-4);
+  position: relative;
+}
+
+/* Dark mode tooltip content */
+:root.dark .tooltip-content {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-900);
+}
+
+/* Tooltip arrow */
+.tooltip-arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-neutral-900);
+  transform: rotate(45deg);
+  z-index: -1;
+}
+
+:root.dark .tooltip-arrow {
+  background-color: var(--color-neutral-100);
+}
+
+/* Arrow positioning by placement */
+.tooltip.top .tooltip-arrow {
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.tooltip.bottom .tooltip-arrow {
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.tooltip.left .tooltip-arrow {
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.tooltip.right .tooltip-arrow {
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+/* Remove arrow if not wanted */
+.tooltip.no-arrow .tooltip-arrow {
+  display: none;
+}
+
+/* Metric tooltip specific styles */
+.metric-tooltip {
+  max-width: 400px;
+}
+
+.metric-tooltip-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.metric-tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+  padding-bottom: var(--spacing-2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+:root.dark .metric-tooltip-header {
+  border-bottom-color: rgba(0, 0, 0, 0.2);
+}
+
+.metric-tooltip-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: inherit;
+  margin: 0;
+  line-height: var(--line-height-tight);
+}
+
+.metric-tooltip-frequency {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-1) var(--spacing-2);
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+}
+
+:root.dark .metric-tooltip-frequency {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.metric-tooltip-description {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  color: inherit;
+  opacity: 0.9;
+}
+
+.metric-tooltip-formula {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.metric-tooltip-formula strong {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: inherit;
+  opacity: 0.8;
+}
+
+.metric-tooltip-formula code {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: inherit;
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  line-height: var(--line-height-relaxed);
+  word-break: break-all;
+}
+
+:root.dark .metric-tooltip-formula code {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.metric-tooltip-source {
+  font-size: var(--font-size-xs);
+  color: inherit;
+  opacity: 0.8;
+}
+
+.metric-tooltip-source strong {
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+/* Help tooltip specific styles */
+.help-tooltip {
+  max-width: 280px;
+}
+
+.help-tooltip-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.help-tooltip-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: inherit;
+  margin: 0;
+  line-height: var(--line-height-tight);
+}
+
+.help-tooltip-description {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  color: inherit;
+  opacity: 0.9;
+}
+
+/* Animation variants */
+.tooltip.fade-in {
+  animation: tooltipFadeIn var(--duration-fast) var(--ease-standard) forwards;
+}
+
+.tooltip.fade-out {
+  animation: tooltipFadeOut var(--duration-fast) var(--ease-standard) forwards;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes tooltipFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+/* Slide animations by placement */
+.tooltip.slide-up {
+  animation: tooltipSlideUp var(--duration-fast) var(--ease-standard) forwards;
+}
+
+.tooltip.slide-down {
+  animation: tooltipSlideDown var(--duration-fast) var(--ease-standard) forwards;
+}
+
+.tooltip.slide-left {
+  animation: tooltipSlideLeft var(--duration-fast) var(--ease-standard) forwards;
+}
+
+.tooltip.slide-right {
+  animation: tooltipSlideRight var(--duration-fast) var(--ease-standard) forwards;
+}
+
+@keyframes tooltipSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes tooltipSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes tooltipSlideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(8px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes tooltipSlideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-8px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  .tooltip-content {
+    background-color: ButtonFace;
+    color: ButtonText;
+    border: 1px solid ButtonText;
+  }
+  
+  .tooltip-arrow {
+    background-color: ButtonFace;
+    border: 1px solid ButtonText;
+  }
+  
+  .metric-tooltip-frequency,
+  .metric-tooltip-formula code {
+    background-color: Highlight;
+    color: HighlightText;
+    border: 1px solid ButtonText;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .metric-tooltip {
+    max-width: 280px;
+  }
+  
+  .help-tooltip {
+    max-width: 240px;
+  }
+  
+  .tooltip-content {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-xs);
+  }
+  
+  .metric-tooltip-title {
+    font-size: var(--font-size-sm);
+  }
+  
+  .metric-tooltip-formula code {
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-1) var(--spacing-2);
+  }
+}
+
+@media (max-width: 480px) {
+  .metric-tooltip,
+  .help-tooltip {
+    max-width: 200px;
+  }
+  
+  .tooltip-content {
+    padding: var(--spacing-2);
+  }
+  
+  .metric-tooltip-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-1);
+  }
+  
+  .metric-tooltip-frequency {
+    align-self: flex-start;
+  }
+}
+
+/* Accessibility: Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .tooltip,
+  .tooltip.fade-in,
+  .tooltip.fade-out,
+  .tooltip.slide-up,
+  .tooltip.slide-down,
+  .tooltip.slide-left,
+  .tooltip.slide-right {
+    transition: opacity 0.1s ease;
+    animation: none;
+  }
+  
+  .tooltip.visible {
+    transform: none;
+  }
+  
+  @keyframes tooltipFadeIn,
+  @keyframes tooltipFadeOut,
+  @keyframes tooltipSlideUp,
+  @keyframes tooltipSlideDown,
+  @keyframes tooltipSlideLeft,
+  @keyframes tooltipSlideRight {
+    from, to {
+      transform: none;
+    }
+  }
+}
+
+/* Print styles - hide tooltips */
+@media print {
+  .tooltip {
+    display: none !important;
+  }
+}

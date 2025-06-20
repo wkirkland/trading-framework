@@ -1,7 +1,18 @@
-import SignalDashboard from '@/components/dashboard/SignalDashboard';
+'use client';
+
+import React from 'react';
+import { LazySignalDashboardWrapper } from '@/components/lazy/LazyComponents';
 
 export default function SignalDashboardPage() {
-  return <SignalDashboard />;
+  return (
+    <div className="container-fluid">
+      <div className="row">
+        <div className="col-12">
+          <LazySignalDashboardWrapper />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export const metadata = {

@@ -1,6 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { useSignalAnalysis } from '@/lib/hooks/useSignalAnalysis';
+import { MetricGrid } from '@/components/metrics/MetricGrid';
+import { MetricTable } from '@/components/metrics/MetricTable';
+import { GaugeChart } from '@/components/charts/GaugeChart';
+import type { MetricCardData } from '@/components/metrics/MetricCard';
 
 const thesisOptions = [
   {
@@ -37,6 +42,9 @@ export default function SignalDashboard() {
     fetchData
   } = useSignalAnalysis();
 
+  // View toggle state
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
+
   const getEvidenceBarStyle = (score: number) => {
     const percentage = Math.max(10, Math.min(90, 50 + (score * 20)));
     const color = score > 1 ? '#10b981' : score > 0 ? '#f59e0b' : score > -1 ? '#ef4444' : '#dc2626';
@@ -51,19 +59,19 @@ export default function SignalDashboard() {
 
   const getSignalClass = (signal: string) => {
     switch (signal) {
-      case 'confirm': return 'priority-high';
-      case 'contradict': return 'priority-critical';
-      case 'neutral': return 'priority-medium';
-      default: return 'priority-low';
+      case 'confirm': return 'signal-pill confirm';
+      case 'contradict': return 'signal-pill contradict';
+      case 'neutral': return 'signal-pill neutral';
+      default: return 'signal-pill neutral';
     }
   };
 
   const getImpactClass = (impact: string) => {
     switch (impact) {
-      case 'high': return 'frequency-daily';
-      case 'medium': return 'frequency-weekly';
-      case 'low': return 'frequency-monthly';
-      default: return 'frequency-quarterly';
+      case 'high': return 'impact-high';
+      case 'medium': return 'impact-medium';
+      case 'low': return 'impact-low';
+      default: return 'impact-low';
     }
   };
 
@@ -81,15 +89,34 @@ export default function SignalDashboard() {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  // Transform keyMetrics to MetricCardData format
+  const metricCardsData: MetricCardData[] = keyMetrics.map((metric) => ({
+    name: metric.name,
+    value: metric.value,
+    signal: metric.currentSignal,
+    impact: metric.impact,
+    change: metric.change,
+    reasoning: metric.reasoning,
+    nextUpdate: metric.nextUpdate,
+    category: 'economic', // Default category for now
+    isLive: metric.value !== null && metric.value !== undefined,
+    // Generate sample sparkline data (in real implementation, this would come from historical data)
+    sparklineData: Array.from({ length: 7 }, (_, i) => 
+      metric.value !== null ? metric.value + (Math.random() - 0.5) * (metric.value * 0.1) : 0
+    )
+  }));
+
   return (
-    <div className="page-container">
-      <div className="card">
+    <div className="container-fluid">
+      <div className="row">
+        <div className="col-12">
+          <div className="card">
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <h1>Signal Conflict Dashboard</h1>
           <p className="subtitle">Real-time tracking of reinforcing vs. contradicting macro signals</p>
           
-          {/* Live Data Status */}
+          {/* Live Data Status with ARIA live region */}
           <div style={{ 
             display: 'flex', 
             justifyContent: 'center', 
@@ -106,18 +133,29 @@ export default function SignalDashboard() {
                 borderRadius: '50%',
                 background: loading ? '#f59e0b' : error ? '#ef4444' : '#10b981'
               }}></div>
-              <span>
+              <span 
+                aria-live="polite"
+                aria-atomic="true"
+                id="analysis-status"
+              >
                 {loading ? 'Updating analysis...' : error ? 'Using cached data' : 'Live analysis active'}
               </span>
             </div>
             
             {lastFetched && (
-              <span>Last updated: {formatLastUpdated(lastFetched)}</span>
+              <span 
+                aria-live="polite"
+                aria-atomic="true"
+                id="last-updated-status"
+              >
+                Last updated: {formatLastUpdated(lastFetched)}
+              </span>
             )}
             
             <button 
               onClick={fetchData}
               disabled={loading}
+              aria-describedby="analysis-status"
               style={{
                 background: 'none',
                 border: '1px solid #d1d5db',
@@ -170,86 +208,154 @@ export default function SignalDashboard() {
           </div>
         </div>
 
-        {/* Dashboard Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
-          {/* Weight of Evidence Panel */}
-          <div style={{ 
-            background: 'linear-gradient(135deg, #10b981, #059669)', 
-            color: 'white', 
-            padding: '1.5rem', 
-            borderRadius: '1rem' 
+        {/* View Toggle Controls */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginBottom: '2rem'
+        }}>
+          <div style={{
+            background: 'var(--color-surface-secondary)',
+            border: '1px solid var(--color-neutral-200)',
+            borderRadius: 'var(--radius-full)',
+            padding: 'var(--spacing-1)',
+            display: 'flex',
+            gap: 'var(--spacing-1)'
           }}>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1.5rem', textAlign: 'center' }}>
-              Weight of Evidence
-            </h3>
-            
-            {Object.entries(evidenceScores).map(([category, score]) => (
-              category !== 'overall' && (
-                <div key={category} style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-                  <div style={{ width: '120px', fontWeight: '600', textTransform: 'capitalize' }}>
-                    {category}
-                  </div>
-                  <div style={{ 
-                    flex: 1, 
-                    height: '25px', 
-                    background: 'rgba(255,255,255,0.3)', 
-                    borderRadius: '0.75rem', 
-                    margin: '0 1rem', 
-                    position: 'relative',
-                    overflow: 'hidden'
-                  }}>
-                    <div style={getEvidenceBarStyle(score)}></div>
-                  </div>
-                  <div style={{ fontWeight: '700', fontSize: '1.1rem' }}>
-                    {score > 0 ? `+${score.toFixed(1)}` : score.toFixed(1)}
-                  </div>
-                </div>
-              )
-            ))}
-            
-            <div style={{ 
-              borderTop: '2px solid rgba(255,255,255,0.3)', 
-              paddingTop: '1rem', 
-              marginTop: '1rem',
-              display: 'flex',
-              alignItems: 'center'
-            }}>
-              <div style={{ width: '120px', fontWeight: '600' }}>Overall</div>
+            <button
+              onClick={() => setViewMode('cards')}
+              className="view-toggle-button"
+              style={{
+                padding: 'var(--spacing-2) var(--spacing-4)',
+                borderRadius: 'var(--radius-full)',
+                border: 'none',
+                background: viewMode === 'cards' ? 'var(--color-primary-500)' : 'transparent',
+                color: viewMode === 'cards' ? 'white' : 'var(--color-neutral-700)',
+                fontWeight: 'var(--font-weight-medium)',
+                fontSize: 'var(--font-size-sm)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--spacing-2)'
+              }}
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14-7H5m14 14H5" />
+              </svg>
+              Cards View
+            </button>
+            <button
+              onClick={() => setViewMode('table')}
+              className="view-toggle-button"
+              style={{
+                padding: 'var(--spacing-2) var(--spacing-4)',
+                borderRadius: 'var(--radius-full)',
+                border: 'none',
+                background: viewMode === 'table' ? 'var(--color-primary-500)' : 'transparent',
+                color: viewMode === 'table' ? 'white' : 'var(--color-neutral-700)',
+                fontWeight: 'var(--font-weight-medium)',
+                fontSize: 'var(--font-size-sm)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--spacing-2)'
+              }}
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 6h18m-7 8h7" />
+              </svg>
+              Table View
+            </button>
+          </div>
+        </div>
+
+        {/* Dashboard Grid */}
+        <div className="row" style={{ marginBottom: '2rem' }}>
+          {/* Weight of Evidence Gauge */}
+          <div className="col-12 col-lg-6">
+            <div className="gauge-card">
+              <GaugeChart
+                value={evidenceScores.overall * 10} // Scale from -10 to +10 range to -100 to +100
+                size={280}
+                title="Weight of Evidence"
+                subtitle={`Based on ${keyMetrics.filter(m => m.value !== null).length} live economic indicators`}
+                showValue={true}
+                showLabels={true}
+                colorScheme="trading"
+              />
+              
+              {/* Breakdown by category */}
               <div style={{ 
-                flex: 1, 
-                height: '25px', 
-                background: 'rgba(255,255,255,0.3)', 
-                borderRadius: '0.75rem', 
-                margin: '0 1rem',
-                position: 'relative',
-                overflow: 'hidden'
+                marginTop: 'var(--spacing-4)',
+                padding: 'var(--spacing-4)',
+                background: 'var(--color-surface-secondary)',
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--color-neutral-200)'
               }}>
-                <div style={getEvidenceBarStyle(evidenceScores.overall)}></div>
+                <h4 style={{ 
+                  margin: '0 0 var(--spacing-3) 0',
+                  fontSize: 'var(--font-size-sm)',
+                  fontWeight: 'var(--font-weight-semibold)',
+                  color: 'var(--color-neutral-700)',
+                  textAlign: 'center'
+                }}>
+                  Category Breakdown
+                </h4>
+                
+                {Object.entries(evidenceScores).map(([category, score]) => (
+                  category !== 'overall' && (
+                    <div key={category} style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'space-between',
+                      marginBottom: 'var(--spacing-2)',
+                      padding: 'var(--spacing-2)',
+                      borderRadius: 'var(--radius-md)',
+                      background: score > 0 ? 'var(--status-confirm-bg)' : 
+                                 score < 0 ? 'var(--status-contradict-bg)' : 
+                                 'var(--status-neutral-bg)'
+                    }}>
+                      <div style={{ 
+                        fontWeight: 'var(--font-weight-medium)',
+                        textTransform: 'capitalize',
+                        fontSize: 'var(--font-size-sm)',
+                        color: score > 0 ? 'var(--status-confirm-text)' :
+                               score < 0 ? 'var(--status-contradict-text)' :
+                               'var(--status-neutral-text)'
+                      }}>
+                        {category}
+                      </div>
+                      <div style={{ 
+                        fontWeight: 'var(--font-weight-bold)',
+                        fontSize: 'var(--font-size-sm)',
+                        color: score > 0 ? 'var(--status-confirm-text)' :
+                               score < 0 ? 'var(--status-contradict-text)' :
+                               'var(--status-neutral-text)'
+                      }}>
+                        {score > 0 ? `+${score.toFixed(1)}` : score.toFixed(1)}
+                      </div>
+                    </div>
+                  )
+                ))}
               </div>
-              <div style={{ fontWeight: '700', fontSize: '1.1rem' }}>
-                {evidenceScores.overall > 0 ? `+${evidenceScores.overall.toFixed(1)}` : evidenceScores.overall.toFixed(1)}
-              </div>
-            </div>
-            
-            {/* Data Quality Indicator */}
-            <div style={{ 
-              marginTop: '1rem', 
-              fontSize: '0.8rem', 
-              opacity: 0.8, 
-              textAlign: 'center' 
-            }}>
-              Based on {keyMetrics.filter(m => m.value !== null).length} live economic indicators
             </div>
           </div>
 
           {/* Conflict Alerts Panel */}
-          <div style={{ 
-            background: 'linear-gradient(135deg, #ef4444, #dc2626)', 
-            color: 'white', 
-            padding: '1.5rem', 
-            borderRadius: '1rem' 
-          }}>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1.5rem', textAlign: 'center' }}>
+          <div className="col-12 col-lg-6">
+            <div style={{ 
+              background: 'linear-gradient(135deg, #ef4444, #dc2626)', 
+              color: 'white', 
+              padding: '1.5rem', 
+              borderRadius: '1rem',
+              height: '100%'
+            }}>
+            <h3 
+              style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '1.5rem', textAlign: 'center' }}
+              aria-live="polite"
+              aria-atomic="true"
+              id="conflict-count"
+            >
               Active Conflicts ({conflictAlerts.filter(a => a.isActive).length})
             </h3>
             
@@ -296,18 +402,21 @@ export default function SignalDashboard() {
                 </div>
               </div>
             )}
+            </div>
           </div>
         </div>
 
         {/* Threshold Triggers */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+        <div className="row" style={{ marginBottom: '2rem' }}>
           {thresholdTriggers.map((trigger, index) => (
-            <div key={index} style={{ 
-              background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', 
-              color: 'white', 
-              padding: '1.5rem', 
-              borderRadius: '1rem' 
-            }}>
+            <div key={index} className="col-12 col-md-4 col-lg-4">
+              <div style={{ 
+                background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', 
+                color: 'white', 
+                padding: '1.5rem', 
+                borderRadius: '1rem',
+                height: '100%'
+              }}>
               <h4 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '1rem' }}>
                 {trigger.title}
               </h4>
@@ -341,98 +450,56 @@ export default function SignalDashboard() {
                 </div>
                 <span>{trigger.triggered}</span>
               </div>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Key Metrics Table */}
-        <div className="table-container">
-          <div style={{ background: 'linear-gradient(135deg, #1f2937, #111827)', color: 'white', padding: '1.5rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1.5rem' }}>Key Metric Signal Mapping</h3>
-            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem', opacity: 0.8 }}>
-              Real-time analysis of {keyMetrics.length} key economic indicators
-            </p>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Metric</th>
-                <th>Current Value</th>
-                <th>Signal</th>
-                <th>Thesis Alignment</th>
-                <th>Impact Weight</th>
-                <th>Recent Change</th>
-                <th>Reasoning</th>
-                <th>Next Update</th>
-              </tr>
-            </thead>
-            <tbody>
-              {keyMetrics.map((metric, index) => (
-                <tr key={index}>
-                  <td>
-                    <strong>{metric.name}</strong>
-                    {metric.value !== null && metric.value !== undefined && (
-                      <div style={{ fontSize: '0.75rem', color: '#10b981', marginTop: '0.25rem' }}>
-                        ● Live Data
-                      </div>
-                    )}
-                  </td>
-                  <td>
-                    {metric.value !== null && metric.value !== undefined ? (
-                      <strong style={{ fontSize: '1.1rem' }}>
-                        {typeof metric.value === 'number' ? metric.value.toFixed(2) : metric.value}
-                        {metric.name.includes('Rate') || metric.name.includes('Unemployment') ? '%' : ''}
-                      </strong>
-                    ) : (
-                      <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>No data</span>
-                    )}
-                  </td>
-                  <td>
-                    <span className={getSignalClass(metric.currentSignal)}>
-                      {metric.currentSignal.toUpperCase()}
-                    </span>
-                  </td>
-                  <td>
-                    <strong style={{ 
-                      color: metric.currentSignal === 'confirm' ? '#10b981' : 
-                             metric.currentSignal === 'contradict' ? '#ef4444' : '#6b7280'
-                    }}>
-                      {metric.currentSignal === 'confirm' ? 'SUPPORTS' :
-                       metric.currentSignal === 'contradict' ? 'CONTRADICTS' : 'NEUTRAL'}
-                    </strong>
-                  </td>
-                  <td>
-                    <span className={getImpactClass(metric.impact)} style={{ textTransform: 'uppercase' }}>
-                      {metric.impact}
-                    </span>
-                  </td>
-                  <td style={{ 
-                    color: metric.change.includes('↑') ? '#10b981' : 
-                           metric.change.includes('↓') ? '#ef4444' : '#6b7280',
-                    fontWeight: '600'
-                  }}>
-                    {metric.change}
-                  </td>
-                  <td>
-                    <div style={{ fontSize: '0.85rem', maxWidth: '200px' }}>
-                      {metric.reasoning}
-                    </div>
-                  </td>
-                  <td>{metric.nextUpdate}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {/* Key Metrics - Conditional View */}
+        {viewMode === 'cards' ? (
+          <MetricGrid
+            title="Key Economic Indicators"
+            subtitle={`Real-time analysis of ${keyMetrics.length} economic signals`}
+            metrics={metricCardsData}
+            layout="normal"
+            cardSize="md"
+            showSparklines={true}
+            loading={loading}
+            error={error ? `Analysis error: ${error}` : undefined}
+            onCardClick={(metric) => {
+              console.log('Metric clicked:', metric.name);
+              // In a real app, this could open a detailed modal or navigate to metric details
+            }}
+          />
+        ) : (
+          <MetricTable
+            title="Key Economic Indicators"
+            subtitle={`Detailed analysis of ${keyMetrics.length} economic signals with sortable columns`}
+            metrics={keyMetrics}
+            loading={loading}
+            error={error ? `Analysis error: ${error}` : undefined}
+            onRowClick={(metric) => {
+              console.log('Table row clicked:', metric.name);
+              // In a real app, this could open a detailed modal or navigate to metric details
+            }}
+          />
+        )}
 
-        {/* Footer */}
+        {/* Footer with live data count */}
         <div style={{ textAlign: 'center', marginTop: '2rem', color: '#666' }}>
           <p style={{ fontSize: '0.9rem' }}>
             Analysis powered by live Federal Reserve economic data (FRED)
           </p>
-          <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>
+          <p 
+            style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}
+            aria-live="polite"
+            aria-atomic="true"
+            id="metrics-count"
+          >
             Evidence scores calculated from {keyMetrics.filter(m => m.value !== null).length} real-time indicators
           </p>
+        </div>
+          </div>
         </div>
       </div>
     </div>

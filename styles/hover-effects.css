@@ -1,0 +1,361 @@
+/* styles/hover-effects.css */
+/* Consistent hover effects and micro-interactions */
+/* 4px translate-Y + shadow with 200ms duration and tokenized cubic-bezier */
+
+/* Base hover transform and timing */
+:root {
+  --hover-transform: translateY(-4px);
+  --hover-shadow: var(--shadow-elevation-3);
+  --hover-duration: var(--duration-fast); /* 200ms */
+  --hover-easing: var(--ease-standard);
+}
+
+/* Universal interactive element base */
+.interactive-element {
+  transition: transform var(--hover-duration) var(--hover-easing),
+              box-shadow var(--hover-duration) var(--hover-easing),
+              border-color var(--hover-duration) var(--hover-easing);
+  cursor: pointer;
+}
+
+.interactive-element:hover {
+  transform: var(--hover-transform);
+  box-shadow: var(--hover-shadow);
+}
+
+/* Metric Cards - Enhanced hover effects */
+.metric-card[role="button"] {
+  transition: transform var(--hover-duration) var(--hover-easing),
+              box-shadow var(--hover-duration) var(--hover-easing),
+              border-color var(--hover-duration) var(--hover-easing),
+              background-color var(--hover-duration) var(--hover-easing);
+}
+
+.metric-card[role="button"]:hover {
+  transform: var(--hover-transform);
+  box-shadow: var(--hover-shadow);
+  border-color: var(--color-primary-300);
+}
+
+.metric-card[role="button"]:active {
+  transform: var(--transform-pressed);
+  box-shadow: var(--shadow-elevation-1);
+}
+
+/* Gauge Chart Cards */
+.gauge-card {
+  transition: transform var(--hover-duration) var(--hover-easing),
+              box-shadow var(--hover-duration) var(--hover-easing);
+}
+
+.gauge-card:hover {
+  transform: var(--hover-transform);
+  box-shadow: var(--hover-shadow);
+}
+
+/* Navigation elements */
+.sidebar-link {
+  transition: transform var(--hover-duration) var(--hover-easing),
+              background-color var(--hover-duration) var(--hover-easing),
+              color var(--hover-duration) var(--hover-easing);
+}
+
+.sidebar-link:hover {
+  transform: translateY(-2px); /* Slightly less movement for sidebar */
+  background-color: var(--color-neutral-100);
+}
+
+.sidebar-link.active:hover {
+  transform: translateY(-2px);
+}
+
+/* Button hover effects */
+button:not(:disabled) {
+  transition: transform var(--hover-duration) var(--hover-easing),
+              box-shadow var(--hover-duration) var(--hover-easing),
+              background-color var(--hover-duration) var(--hover-easing),
+              border-color var(--hover-duration) var(--hover-easing);
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevation-2);
+}
+
+button:not(:disabled):active {
+  transform: translateY(0px);
+  box-shadow: var(--shadow-elevation-1);
+}
+
+/* Theme toggle specific */
+.hamburger-menu,
+button[aria-label*="theme"],
+button[aria-label*="Theme"] {
+  transition: transform var(--hover-duration) var(--hover-easing),
+              background-color var(--hover-duration) var(--hover-easing),
+              color var(--hover-duration) var(--hover-easing);
+}
+
+.hamburger-menu:hover,
+button[aria-label*="theme"]:hover,
+button[aria-label*="Theme"]:hover {
+  transform: translateY(-2px);
+  background-color: var(--color-neutral-100);
+}
+
+/* Table row hover effects */
+.data-table-row.clickable {
+  transition: transform var(--hover-duration) var(--hover-easing),
+              background-color var(--hover-duration) var(--hover-easing),
+              box-shadow var(--hover-duration) var(--hover-easing);
+}
+
+.data-table-row.clickable:hover {
+  transform: translateX(4px); /* Horizontal movement for table rows */
+  background-color: var(--color-primary-50);
+  box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.metric-row:hover {
+  transform: translateX(4px);
+  background-color: var(--color-surface-secondary);
+  box-shadow: -4px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Sortable table headers */
+.data-table-header.sortable {
+  transition: background-color var(--hover-duration) var(--hover-easing),
+              transform var(--hover-duration) var(--hover-easing);
+}
+
+.data-table-header.sortable:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Pagination buttons */
+.pagination-button:not(:disabled) {
+  transition: transform var(--hover-duration) var(--hover-easing),
+              background-color var(--hover-duration) var(--hover-easing),
+              border-color var(--hover-duration) var(--hover-easing),
+              color var(--hover-duration) var(--hover-easing);
+}
+
+.pagination-button:not(:disabled):hover {
+  transform: translateY(-2px);
+  background-color: var(--color-primary-50);
+  border-color: var(--color-primary-300);
+  color: var(--color-primary-700);
+}
+
+/* View toggle buttons */
+.view-toggle-button {
+  transition: transform var(--hover-duration) var(--hover-easing),
+              background-color var(--hover-duration) var(--hover-easing),
+              color var(--hover-duration) var(--hover-easing),
+              box-shadow var(--hover-duration) var(--hover-easing);
+}
+
+.view-toggle-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevation-1);
+}
+
+/* Conflict alert cards */
+.conflict-alert-card {
+  transition: transform var(--hover-duration) var(--hover-easing),
+              background-color var(--hover-duration) var(--hover-easing),
+              box-shadow var(--hover-duration) var(--hover-easing);
+}
+
+.conflict-alert-card:hover {
+  transform: var(--hover-transform);
+  background-color: rgba(255, 255, 255, 0.3);
+  box-shadow: var(--shadow-elevation-2);
+}
+
+/* Threshold trigger cards */
+.threshold-trigger-card {
+  transition: transform var(--hover-duration) var(--hover-easing),
+              box-shadow var(--hover-duration) var(--hover-easing);
+}
+
+.threshold-trigger-card:hover {
+  transform: var(--hover-transform);
+  box-shadow: var(--shadow-elevation-3);
+}
+
+/* Sparkline hover effects */
+.metric-sparkline-container {
+  transition: opacity var(--hover-duration) var(--hover-easing);
+}
+
+.metric-card:hover .metric-sparkline-container {
+  opacity: 1;
+}
+
+.metric-card:hover .sparkline polyline {
+  stroke-width: 2;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Status pills hover effects */
+.metric-pill,
+.signal-badge,
+.alignment-badge,
+.impact-badge {
+  transition: transform var(--hover-duration) var(--hover-easing),
+              box-shadow var(--hover-duration) var(--hover-easing);
+}
+
+.metric-card:hover .metric-pill,
+.data-table-row:hover .signal-badge,
+.data-table-row:hover .alignment-badge,
+.data-table-row:hover .impact-badge {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-elevation-1);
+}
+
+/* Link hover effects */
+a:not(.sidebar-link):not(.nav-item) {
+  transition: color var(--hover-duration) var(--hover-easing),
+              text-decoration-color var(--hover-duration) var(--hover-easing);
+}
+
+a:not(.sidebar-link):not(.nav-item):hover {
+  color: var(--color-primary-600);
+  text-decoration-color: var(--color-primary-600);
+}
+
+/* Focus states with elevation */
+.interactive-element:focus,
+.metric-card[role="button"]:focus,
+.gauge-card:focus,
+button:focus,
+.data-table-row.clickable:focus {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+  transform: var(--hover-transform);
+  box-shadow: var(--hover-shadow);
+}
+
+/* Group hover effects for related elements */
+.metric-grid:hover .metric-card:not(:hover) {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+.metrics-grid:hover .metric-card:not(:hover) {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+/* Staggered animation delays for groups */
+.metric-card:nth-child(1) { transition-delay: 0ms; }
+.metric-card:nth-child(2) { transition-delay: 50ms; }
+.metric-card:nth-child(3) { transition-delay: 100ms; }
+.metric-card:nth-child(4) { transition-delay: 150ms; }
+.metric-card:nth-child(5) { transition-delay: 200ms; }
+.metric-card:nth-child(6) { transition-delay: 250ms; }
+
+/* Loading state hover prevention */
+.metric-card-skeleton,
+.loading-spinner,
+.data-table-loading {
+  pointer-events: none;
+}
+
+/* Dark mode adjustments */
+:root.dark .data-table-row.clickable:hover {
+  background-color: var(--color-primary-950);
+}
+
+:root.dark .sidebar-link:hover {
+  background-color: var(--color-neutral-800);
+}
+
+:root.dark .pagination-button:not(:disabled):hover {
+  background-color: var(--color-primary-950);
+  border-color: var(--color-primary-700);
+  color: var(--color-primary-300);
+}
+
+/* Responsive hover effects */
+@media (max-width: 768px) {
+  /* Reduce hover effects on mobile to prevent sticky hover states */
+  .metric-card[role="button"]:hover,
+  .gauge-card:hover,
+  .data-table-row.clickable:hover,
+  .metric-row:hover {
+    transform: none;
+    box-shadow: var(--shadow-elevation-1);
+  }
+  
+  /* Maintain button feedback on mobile */
+  button:not(:disabled):active {
+    transform: scale(0.95);
+  }
+}
+
+/* Accessibility: Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .interactive-element,
+  .metric-card[role="button"],
+  .gauge-card,
+  button,
+  .data-table-row.clickable,
+  .sidebar-link,
+  .pagination-button,
+  .conflict-alert-card,
+  .threshold-trigger-card,
+  .metric-pill,
+  .signal-badge,
+  .alignment-badge,
+  .impact-badge {
+    transition: none;
+    transform: none;
+  }
+  
+  .interactive-element:hover,
+  .metric-card[role="button"]:hover,
+  .gauge-card:hover,
+  button:hover,
+  .data-table-row.clickable:hover,
+  .metric-row:hover {
+    transform: none;
+  }
+  
+  /* Keep focus states for accessibility */
+  .interactive-element:focus,
+  .metric-card[role="button"]:focus,
+  button:focus {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+    transform: none;
+  }
+}
+
+/* High contrast mode - enhance focus visibility */
+@media (forced-colors: active) {
+  .interactive-element:focus,
+  .metric-card[role="button"]:focus,
+  button:focus,
+  .data-table-row.clickable:focus {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+
+/* Print mode - remove all hover effects */
+@media print {
+  .interactive-element,
+  .metric-card[role="button"],
+  .gauge-card,
+  button,
+  .data-table-row.clickable,
+  .sidebar-link {
+    transition: none;
+    transform: none;
+    box-shadow: none;
+  }
+}

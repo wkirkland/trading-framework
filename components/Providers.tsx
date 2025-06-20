@@ -5,7 +5,8 @@ import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
-import { DataProvider } from '@/lib/context/DataContext'; // Import DataProvider
+import { DataProvider } from '@/lib/context/DataContext';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
 
 // Helper function to create a QueryClient instance
 function makeQueryClient() {
@@ -48,11 +49,14 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* DataProvider is now nested inside QueryClientProvider */}
-      {/* This allows DataProvider to use hooks like useQuery from TanStack Query */}
-      <DataProvider>
-        {children}
-      </DataProvider>
+      {/* ThemeProvider provides theme context to the entire app */}
+      <ThemeProvider>
+        {/* DataProvider is nested inside both QueryClient and Theme providers */}
+        {/* This allows DataProvider to use hooks like useQuery from TanStack Query */}
+        <DataProvider>
+          {children}
+        </DataProvider>
+      </ThemeProvider>
 
       {/* React Query Devtools - only included in development */}
       {process.env.NODE_ENV === 'development' && (

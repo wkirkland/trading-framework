@@ -1,0 +1,77 @@
+/* styles/live-region.css */
+/* ARIA live region styles for dynamic content announcements */
+
+/* Base live region - visible by default */
+.live-region {
+  /* No special visual styling - content should look normal */
+}
+
+/* Screen reader only live region */
+.live-region.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Status region styling */
+.status-region {
+  /* Inherit parent styling - status regions should blend in */
+}
+
+/* Alert region styling - should be more prominent */
+.alert-region {
+  /* Can be styled to stand out visually if needed */
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Count region styling */
+.count-region {
+  /* Subtle styling for count updates */
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+
+/* Progress region styling */
+.progress-region {
+  /* Subtle styling for progress updates */
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+}
+
+/* Focus management for live regions */
+.live-region:focus {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  .alert-region {
+    color: Highlight;
+    background-color: HighlightText;
+    border: 1px solid Highlight;
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--radius-sm);
+  }
+}
+
+/* Reduced motion - remove transitions */
+@media (prefers-reduced-motion: reduce) {
+  .count-region,
+  .progress-region {
+    transition: none;
+  }
+}
+
+/* Print styles - hide announcement regions */
+@media print {
+  .live-region.sr-only,
+  .announcement-region {
+    display: none !important;
+  }
+}

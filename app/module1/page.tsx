@@ -3,7 +3,8 @@
 
 import { MetricsTable } from '@/components/dashboard/MetricsTable';
 import { useSignalAnalysis } from '@/lib/hooks/useSignalAnalysis'; 
-import { THESIS_SCORING_RULES } from '@/lib/config/signalThesisRules'; 
+import { THESIS_SCORING_RULES } from '@/lib/config/signalThesisRules';
+import { LazyWrapper } from '@/components/lazy/LazyComponents'; 
 
 const pocThesisNames = Object.keys(THESIS_SCORING_RULES);
 
@@ -111,7 +112,13 @@ export default function Module1Page() {
       </div> {/* Closes STYLED HEADER CARD */}
 
       {/* METRICSTABLE - This is the second direct child of page-container */}
-      <MetricsTable metricsForTable={keyMetrics} />
+      <LazyWrapper 
+        fallbackType="table" 
+        fallbackCount={15}
+        ariaLabel="Loading metrics table"
+      >
+        <MetricsTable metricsForTable={keyMetrics} />
+      </LazyWrapper>
 
     </div> // Closes OUTERMOST PAGE CONTAINER
   ); // Closes MAIN RETURN

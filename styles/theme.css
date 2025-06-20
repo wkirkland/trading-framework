@@ -1,0 +1,289 @@
+/* styles/theme.css */
+/* CSS Custom Properties for design tokens */
+/* Auto-generated from tokens.ts - supports light/dark mode switching */
+
+:root {
+  /* Color scheme */
+  color-scheme: light;
+  
+  /* Neutral colors */
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+  --color-neutral-950: #0a0a0a;
+
+  /* Primary colors */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary-950: #172554;
+
+  /* Status colors - Confirm (Success/Green) */
+  --status-confirm-bg: #dcfce7;
+  --status-confirm-text: #15803d;
+  --status-confirm-hover: #bbf7d0;
+  --status-confirm-border: #86efac;
+  --status-confirm-solid: #22c55e;
+
+  /* Status colors - Contradict (Error/Red) */
+  --status-contradict-bg: #fef2f2;
+  --status-contradict-text: #dc2626;
+  --status-contradict-hover: #fee2e2;
+  --status-contradict-border: #fca5a5;
+  --status-contradict-solid: #ef4444;
+
+  /* Status colors - Neutral (Warning/Amber) */
+  --status-neutral-bg: #fefbeb;
+  --status-neutral-text: #d97706;
+  --status-neutral-hover: #fef3c7;
+  --status-neutral-border: #fcd34d;
+  --status-neutral-solid: #f59e0b;
+
+  /* Data visualization colors */
+  --color-data-positive: #10b981;
+  --color-data-negative: #ef4444;
+  --color-data-neutral: #6b7280;
+  --color-data-accent: #8b5cf6;
+
+  /* Surface colors */
+  --color-surface-primary: #ffffff;
+  --color-surface-secondary: #f9fafb;
+  --color-surface-tertiary: #f3f4f6;
+  --color-surface-inverse: #111827;
+
+  /* Typography */
+  --font-family-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-family-mono: 'JetBrains Mono', ui-monospace, Menlo, Monaco, monospace;
+  --font-family-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* Font sizes */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+
+  /* Line heights */
+  --line-height-xs: 1rem;
+  --line-height-sm: 1.25rem;
+  --line-height-base: 1.5rem;
+  --line-height-lg: 1.75rem;
+  --line-height-xl: 1.75rem;
+  --line-height-2xl: 2rem;
+  --line-height-3xl: 2.25rem;
+  --line-height-4xl: 2.5rem;
+
+  /* Font weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Spacing scale */
+  --spacing-px: 1px;
+  --spacing-0: 0rem;
+  --spacing-0-5: 0.125rem;
+  --spacing-1: 0.25rem;
+  --spacing-1-5: 0.375rem;
+  --spacing-2: 0.5rem;
+  --spacing-2-5: 0.625rem;
+  --spacing-3: 0.75rem;
+  --spacing-3-5: 0.875rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-7: 1.75rem;
+  --spacing-8: 2rem;
+  --spacing-9: 2.25rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+  --spacing-32: 8rem;
+
+  /* Border radius */
+  --radius-none: 0rem;
+  --radius-sm: 0.125rem;
+  --radius-base: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Box shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-base: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+  /* Elevation shadows for interactive elements */
+  --shadow-elevation-1: var(--shadow-base);
+  --shadow-elevation-2: var(--shadow-md);
+  --shadow-elevation-3: var(--shadow-lg);
+  --shadow-elevation-4: var(--shadow-xl);
+
+  /* Z-index scale */
+  --z-hide: -1;
+  --z-base: 0;
+  --z-docked: 10;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-banner: 1200;
+  --z-overlay: 1300;
+  --z-modal: 1400;
+  --z-popover: 1500;
+  --z-toast: 1700;
+  --z-tooltip: 1800;
+
+  /* Motion/Animation */
+  --duration-fastest: 100ms;
+  --duration-fast: 200ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-slowest: 800ms;
+
+  /* Easing curves */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+
+  /* Transform presets */
+  --transform-hover-elevate: translateY(-4px);
+  --transform-pressed: translateY(-2px);
+  --transform-scale-enter: scale(1.02);
+}
+
+/* Dark mode theme */
+:root.dark,
+[data-theme="dark"] {
+  color-scheme: dark;
+  
+  /* Neutral colors - inverted */
+  --color-neutral-50: #0a0a0a;
+  --color-neutral-100: #171717;
+  --color-neutral-200: #262626;
+  --color-neutral-300: #404040;
+  --color-neutral-400: #525252;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #a3a3a3;
+  --color-neutral-700: #d4d4d4;
+  --color-neutral-800: #e5e5e5;
+  --color-neutral-900: #f5f5f5;
+  --color-neutral-950: #fafafa;
+
+  /* Primary colors - adjusted for dark mode */
+  --color-primary-50: #172554;
+  --color-primary-100: #1e3a8a;
+  --color-primary-200: #1e40af;
+  --color-primary-300: #1d4ed8;
+  --color-primary-400: #2563eb;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #60a5fa;
+  --color-primary-700: #93c5fd;
+  --color-primary-800: #bfdbfe;
+  --color-primary-900: #dbeafe;
+  --color-primary-950: #eff6ff;
+
+  /* Status colors - Dark mode variants */
+  --status-confirm-bg: #064e3b;
+  --status-confirm-text: #6ee7b7;
+  --status-confirm-hover: #065f46;
+  --status-confirm-border: #059669;
+  --status-confirm-solid: #10b981;
+
+  --status-contradict-bg: #7f1d1d;
+  --status-contradict-text: #fca5a5;
+  --status-contradict-hover: #991b1b;
+  --status-contradict-border: #dc2626;
+  --status-contradict-solid: #ef4444;
+
+  --status-neutral-bg: #78350f;
+  --status-neutral-text: #fcd34d;
+  --status-neutral-hover: #92400e;
+  --status-neutral-border: #d97706;
+  --status-neutral-solid: #f59e0b;
+
+  /* Data visualization colors - lighter for dark mode */
+  --color-data-positive: #34d399;
+  --color-data-negative: #f87171;
+  --color-data-neutral: #9ca3af;
+  --color-data-accent: #a78bfa;
+
+  /* Surface colors - dark variants */
+  --color-surface-primary: #111827;
+  --color-surface-secondary: #1f2937;
+  --color-surface-tertiary: #374151;
+  --color-surface-inverse: #ffffff;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fastest: 0ms;
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+    --duration-slowest: 0ms;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --status-confirm-text: #166534;
+    --status-contradict-text: #b91c1c;
+    --status-neutral-text: #c2410c;
+  }
+  
+  :root.dark {
+    --status-confirm-text: #4ade80;
+    --status-contradict-text: #fb7185;
+    --status-neutral-text: #facc15;
+  }
+}
+
+/* Force colors mode (Windows High Contrast) */
+@media (forced-colors: active) {
+  :root {
+    --color-surface-primary: Canvas;
+    --color-surface-secondary: Canvas;
+    --color-surface-tertiary: Canvas;
+    --color-neutral-900: CanvasText;
+    --color-neutral-100: Canvas;
+    --status-confirm-text: LinkText;
+    --status-contradict-text: LinkText;
+    --status-neutral-text: LinkText;
+  }
+}
