@@ -61,8 +61,7 @@ class ErrorTracker {
     process.on('unhandledRejection', (reason, promise) => {
       this.captureError(new Error(`Unhandled Promise Rejection: ${reason}`), {
         component: 'UNHANDLED_REJECTION',
-        operation: 'promise_rejection',
-        metadata: { promise: promise.toString() },
+        operation: `promise_rejection: ${promise.toString()}`,
       });
     });
 
