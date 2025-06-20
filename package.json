@@ -12,12 +12,16 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --watchAll=false",
+    "test:integration": "jest --config jest.integration.config.js",
+    "test:integration:watch": "jest --config jest.integration.config.js --watch",
+    "test:all": "npm run test && npm run test:integration",
     "prepare": "husky install",
     "setup": "scripts/setup-dev.sh",
     "docker:test": "scripts/test-docker.sh",
     "security:scan": "gitleaks detect --config .gitleaks.toml || echo 'Install gitleaks for secret scanning'",
     "precommit": "npm run lint && npm run test:ci && npm run security:scan",
-    "validate": "npm run lint && npm run test:ci && npm run build"
+    "validate": "npm run lint && npm run test:ci && npm run build",
+    "validate:integration": "npm run lint && npm run test:all && npm run build"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -43,6 +47,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
+    "dotenv": "^16.4.7",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "husky": "^8.0.0",
