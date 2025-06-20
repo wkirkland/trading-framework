@@ -488,46 +488,157 @@ To add new data sources:
 
 ### Automated Testing Framework
 
-The project includes comprehensive Jest-based testing with focus on security and reliability:
+The project includes comprehensive testing with both unit tests and real-world integration tests:
 
 ```bash
-# Run all tests
+# Unit Tests (mocked APIs)
 npm test
-
-# Run tests in watch mode
 npm run test:watch
-
-# Run tests with coverage report
 npm run test:coverage
-
-# Run CI tests (non-interactive)
 npm run test:ci
+
+# Integration Tests (real APIs)
+npm run test:integration
+npm run test:integration:watch
+
+# Run all tests
+npm run test:all
 ```
 
 #### Test Categories
 
-1. **Unit Tests**: Core functionality testing
+1. **Unit Tests**: Core functionality with mocked dependencies
    - `tests/fredClient.test.ts` - HTTP client security and functionality
    - `tests/fredService.test.ts` - Service layer business logic
    - `tests/env.test.ts` - Environment configuration validation
 
-2. **Security Tests**: API key exposure prevention
-   - URL security validation
-   - Header injection testing  
-   - Environment variable protection
+2. **Integration Tests**: Real API validation with live data
+   - `tests/integration/fredClient.integration.test.ts` - Real FRED API connectivity
+   - `tests/integration/fredService.integration.test.ts` - Service layer with live data
+   - `tests/integration/security.integration.test.ts` - Security validation with real scenarios
+   - `tests/integration/healthCheck.integration.test.ts` - Health monitoring system
+   - `tests/integration/healthEndpoints.integration.test.ts` - Kubernetes-ready health APIs
 
-3. **Integration Tests**: End-to-end workflow testing
-   - API integration testing
-   - Error handling validation
-   - Cache functionality verification
+3. **Security Tests**: Comprehensive security validation
+   - API key exposure prevention across all systems
+   - Input sanitization and XSS protection
+   - Network security enforcement (HTTPS)
+   - Error message security (no sensitive data leakage)
 
 #### Test Coverage
 
-Current test coverage targets:
-- **Branches**: 80%
-- **Functions**: 80%
-- **Lines**: 80%
-- **Statements**: 80%
+**Unit Test Coverage Targets:**
+- **Global**: 80% statements, branches, functions, lines
+- **Security-Critical Components**: 90%+ coverage
+  - `lib/config/env.ts` - 100% (environment validation)
+  - `lib/http/fredClient.ts` - 88% (secure HTTP client)
+
+**Integration Test Coverage:**
+- **Real FRED API**: Economic data validation with live data
+- **Health Monitoring**: Production health check system validation
+- **Security Systems**: End-to-end security validation
+- **Performance**: Response time and load testing
+
+### Integration Testing Setup
+
+#### Prerequisites for Integration Tests
+
+Integration tests require real API keys to validate the security refactor:
+
+1. **FRED API Key** (Required)
+   - Free registration at https://fred.stlouisfed.org/docs/api/api_key.html
+   - Used to test real economic data integration
+
+2. **Alpha Vantage API Key** (Optional)
+   - Free registration at https://www.alphavantage.co/support/#api-key
+   - Used for market data integration testing
+
+#### Quick Setup
+
+```bash
+# Set up integration test environment
+./scripts/setup-integration.sh
+
+# Run integration tests
+./scripts/run-integration-tests.sh
+```
+
+#### Manual Setup
+
+1. **Configure API Keys**:
+   ```bash
+   cp .env.integration .env.integration.local
+   # Edit .env.integration.local with your real API keys
+   ```
+
+2. **Run Integration Tests**:
+   ```bash
+   npm run test:integration
+   ```
+
+#### What Integration Tests Validate
+
+1. **FRED API Integration**:
+   - ✅ Real API authentication with production keys
+   - ✅ Live economic data fetching (UNRATE, GDPC1, CPIAUCSL)
+   - ✅ Error handling with invalid series and rate limiting
+   - ✅ Bulk operations with real data
+   - ✅ Performance benchmarking against production baselines
+
+2. **Security Validation**:
+   - ✅ API key protection across all logging systems
+   - ✅ URL security - no API keys exposed in logs or errors
+   - ✅ Input sanitization for malicious inputs
+   - ✅ Error message security (no sensitive data exposure)
+   - ✅ Network security enforcement (HTTPS only)
+
+3. **Health Check System**:
+   - ✅ Production health monitoring with real API connectivity
+   - ✅ Kubernetes-ready endpoints (`/api/health`, `/api/ready`, `/api/live`)
+   - ✅ Memory monitoring and performance tracking
+   - ✅ Error scenario handling and graceful degradation
+   - ✅ Load testing with concurrent requests
+
+4. **Performance & Reliability**:
+   - ✅ Response times meet production baselines (<5s per request)
+   - ✅ Concurrent request handling (5-50 simultaneous requests)
+   - ✅ Network failure recovery and retry mechanisms
+   - ✅ Data consistency across multiple API calls
+
+#### Integration Test Results
+
+Current integration test suite includes **5 test categories** with **50+ test scenarios**:
+
+- **FRED Client Integration**: 15+ scenarios testing real API connectivity
+- **Service Layer Integration**: 12+ scenarios with live economic data
+- **Security Integration**: 10+ scenarios validating security across all systems
+- **Health Check System**: 8+ scenarios testing monitoring infrastructure
+- **Health API Endpoints**: 10+ scenarios testing Kubernetes-ready endpoints
+
+**Performance Baselines:**
+- Health checks: <2 seconds
+- Single API requests: <5 seconds  
+- Bulk operations: <15 seconds
+- Concurrent requests: Efficient scaling
+
+### Health Check & Monitoring APIs
+
+The system includes production-ready health check endpoints for monitoring and deployment:
+
+```bash
+# Health check endpoints
+curl http://localhost:3000/api/health    # Comprehensive health status
+curl http://localhost:3000/api/ready     # Kubernetes readiness probe
+curl http://localhost:3000/api/live      # Kubernetes liveness probe
+```
+
+**Health Check Features:**
+- ✅ Real FRED API connectivity validation
+- ✅ Environment configuration verification
+- ✅ Memory usage monitoring
+- ✅ Performance timing tracking
+- ✅ Detailed error reporting
+- ✅ Machine-readable JSON responses
 
 ### Manual Testing
 
