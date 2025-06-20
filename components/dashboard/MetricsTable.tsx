@@ -3,11 +3,11 @@
 
 import React from 'react'; // Import React if using JSX features like fragments
 
-import type { PocKeyMetricUI } from '@/lib/hooks/useSignalAnalysis'; // Import the type for the metrics data
+import type { SignalData } from '@/lib/hooks/useSignalAnalysis'; // Import the type for the metrics data
 
 // Define props for the component
 interface MetricsTableProps {
-  metricsForTable: PocKeyMetricUI[];
+  metricsForTable: SignalData[];
   // Optional: pass loading/error/lastFetched/fetchData from parent if needed here
   // isLoading?: boolean;
   // dataError?: any;
