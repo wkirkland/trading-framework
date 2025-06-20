@@ -191,7 +191,7 @@ class ErrorTracker {
       this.capturePerformanceMetric(operation, duration, component, { ...metadata, error: true });
       
       if (error instanceof Error) {
-        this.captureError(error, { component, operation, metadata });
+        this.captureError(error, { component, operation });
       }
       
       throw error;
@@ -344,7 +344,7 @@ export function withErrorTracking<T>(
     return fn();
   } catch (error) {
     if (error instanceof Error) {
-      errorTracker.captureError(error, { component, operation, metadata });
+      errorTracker.captureError(error, { component, operation });
     }
     throw error;
   }
@@ -360,7 +360,7 @@ export async function withAsyncErrorTracking<T>(
     return await fn();
   } catch (error) {
     if (error instanceof Error) {
-      errorTracker.captureError(error, { component, operation, metadata });
+      errorTracker.captureError(error, { component, operation });
     }
     throw error;
   }
