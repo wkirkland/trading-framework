@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { AnnouncementRegion } from '@/components/ui/LiveRegion';
+
 import { MetricCard, type MetricCardData } from './MetricCard';
 
 interface MetricGridProps {
