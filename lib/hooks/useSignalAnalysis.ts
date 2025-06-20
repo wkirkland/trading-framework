@@ -8,6 +8,8 @@ import {
   calculatePocWeightOfEvidence, // Our NEW PoC calculation function
   PocAnalysisOutput,            // Type for the output of the new function
   PocMetricAnalysisDetail,      // Type for detailed metric analysis
+  ConflictAlert,                // Import ConflictAlert type
+  ThresholdTrigger,             // Import ThresholdTrigger type
   // GetLiveValueFunction,    // Already available via useLiveData
 } from '@/lib/analysis'; // Updated to use new analysis module
 // Note: We might not need to import GetLiveValueFunction type explicitly if useLiveData provides it typed.
@@ -103,8 +105,8 @@ export function useSignalAnalysis() {
 
   // For PoC, conflictAlerts and thresholdTriggers are out of scope for this core hook.
   // They can be separate hooks or added back later if their logic is updated.
-  const conflictAlerts = useMemo(() => [], []); // Empty array for PoC
-  const thresholdTriggers = useMemo(() => [], []); // Empty array for PoC
+  const conflictAlerts = useMemo((): ConflictAlert[] => [], []); // Empty array for PoC
+  const thresholdTriggers = useMemo((): ThresholdTrigger[] => [], []); // Empty array for PoC
 
   return {
     selectedThesis,
