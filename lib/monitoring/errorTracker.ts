@@ -103,7 +103,6 @@ class ErrorTracker {
       context: fullContext,
       severity,
       fingerprint,
-      metadata: context.metadata,
     };
 
     this.errorBuffer.push(errorReport);
