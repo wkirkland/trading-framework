@@ -1,6 +1,6 @@
 // lib/services/fredService.ts
 
-import { getFredClient, type FredResponse, FredRequestError, FredAuthError } from '@/lib/http/fredClient';
+import { getFredClient, FredRequestError, FredAuthError } from '@/lib/http/fredClient';
 
 interface FredDataPoint {
   date: string;

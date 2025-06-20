@@ -5,8 +5,7 @@ import type {
   ThresholdTrigger,
   GetLiveValueFunction,
   TriggerStatus,
-  CategoryType,
-  EvaluateThresholdTriggersParams
+  CategoryType
 } from '../types/analysis.types';
 
 /**

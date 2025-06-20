@@ -4,8 +4,7 @@
 import type {
   ConflictAlert,
   GetLiveValueFunction,
-  AlertSeverity,
-  GenerateConflictAlertsParams
+  AlertSeverity
 } from '../types/analysis.types';
 
 /**

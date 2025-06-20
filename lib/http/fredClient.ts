@@ -172,7 +172,7 @@ class FredClient {
 
         try {
           return await this.json();
-        } catch (error) {
+        } catch {
           throw new FredRequestError(this.status, this.statusText, 'Invalid JSON response from FRED API');
         }
       };

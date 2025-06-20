@@ -47,7 +47,7 @@ async function fetchLiveApiData(): Promise<Record<string, LiveMetricData>> {
     try {
       const errorData = await response.json();
       errorMsg = errorData.error || errorData.message || errorMsg;
-    } catch (e) {
+    } catch {
       // Ignore if response body isn't JSON
     }
     console.error('❌ TanStack Query: Network response was not ok.', errorMsg);

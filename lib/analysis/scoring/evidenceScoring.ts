@@ -6,8 +6,7 @@ import type {
   BasicEvidenceScores,
   MarketIndicators,
   GetLiveValueFunction,
-  ThesisScoringRules,
-  CalculateEvidenceScoresParams
+  ThesisScoringRules
 } from '../types/analysis.types';
 
 /**

@@ -1,7 +1,8 @@
 // lib/monitoring/errorTracker.ts
 
-import { logger } from './logger';
 import { getCachedEnv } from '@/lib/config/env';
+
+import { logger } from './logger';
 
 export interface ErrorReport {
   id: string;

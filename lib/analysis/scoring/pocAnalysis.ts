@@ -6,8 +6,7 @@ import type {
   PocMetricAnalysisDetail,
   GetLiveValueFunction,
   PocMetricRule,
-  POC_THESIS_SCORING_RULES_TYPE,
-  CalculatePocAnalysisParams
+  POC_THESIS_SCORING_RULES_TYPE
 } from '../types/analysis.types';
 
 /**
