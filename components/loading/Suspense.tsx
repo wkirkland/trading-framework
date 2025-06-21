@@ -28,7 +28,7 @@ export function SuspenseWrapper({
       case 'card':
         return <Skeleton.Card count={count} className={className} />;
       case 'table':
-        return <Skeleton.Table count={count} className={className} />;
+        return <Skeleton.Table rows={count} className={className} />;
       case 'chart':
         return <Skeleton.Chart className={className} />;
       case 'grid':
