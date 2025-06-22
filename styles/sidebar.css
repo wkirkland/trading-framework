@@ -8,18 +8,13 @@
   left: 0;
   width: 280px;
   height: 100vh;
-  background-color: var(--color-surface-primary);
-  border-right: 1px solid var(--color-neutral-200);
+  background-color: var(--surface-1);
+  border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   z-index: var(--z-docked);
   overflow-y: auto;
   transition: all var(--duration-normal) var(--ease-standard);
-}
-
-/* Dark mode border */
-:root.dark .sidebar {
-  border-right-color: var(--color-neutral-700);
 }
 
 /* Sidebar header with logo */
@@ -93,24 +88,24 @@
   margin-bottom: var(--spacing-1);
 }
 
-/* Navigation links */
+/* Navigation links - WCAG AA compliant contrast */
 .sidebar-link {
   display: flex;
   align-items: center;
   gap: var(--spacing-3);
   padding: var(--spacing-3) var(--spacing-6);
   text-decoration: none;
-  color: var(--color-neutral-700);
+  color: var(--on-surface-1);
   border-radius: 0;
-  transition: all var(--duration-fast) var(--ease-standard);
+  transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
   position: relative;
   margin: 0 var(--spacing-3);
   border-radius: var(--radius-lg);
 }
 
 .sidebar-link:hover {
-  background-color: var(--color-neutral-100);
-  color: var(--color-neutral-900);
+  background-color: var(--surface-3);
+  color: var(--on-surface-1-hover);
   transform: var(--transform-hover-elevate);
 }
 
@@ -121,13 +116,13 @@
 
 /* Active state */
 .sidebar-link.active {
-  background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-hover));
   color: white;
-  box-shadow: var(--shadow-elevation-2);
+  box-shadow: var(--shadow-default);
 }
 
 .sidebar-link.active:hover {
-  background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+  background: linear-gradient(135deg, var(--brand-primary-hover), var(--brand-primary));
   transform: var(--transform-hover-elevate);
 }
 

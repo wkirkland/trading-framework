@@ -3,18 +3,15 @@
 /* Uses design tokens for consistent theming and responsiveness */
 
 .metric-card {
-  background-color: var(--color-surface-primary);
-  border: 1px solid var(--color-neutral-200);
+  background-color: var(--surface-2);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xl);
   padding: var(--spacing-4);
   transition: all var(--duration-fast) var(--ease-standard);
   cursor: default;
   position: relative;
   overflow: hidden;
-}
-
-:root.dark .metric-card {
-  border-color: var(--color-neutral-700);
+  box-shadow: var(--shadow-subtle);
 }
 
 /* Interactive cards */
@@ -24,8 +21,9 @@
 
 .metric-card[role="button"]:hover {
   transform: var(--transform-hover-elevate);
-  box-shadow: var(--shadow-elevation-3);
-  border-color: var(--color-primary-300);
+  box-shadow: var(--shadow-strong);
+  border-color: var(--brand-primary);
+  background-color: var(--surface-3);
 }
 
 .metric-card[role="button"]:focus {
@@ -220,15 +218,15 @@
 }
 
 .metric-change.change-positive {
-  color: var(--color-data-positive);
+  color: var(--status-positive);
 }
 
 .metric-change.change-negative {
-  color: var(--color-data-negative);
+  color: var(--status-negative);
 }
 
 .metric-change.change-neutral {
-  color: var(--color-data-neutral);
+  color: var(--status-neutral);
 }
 
 /* Sparkline */

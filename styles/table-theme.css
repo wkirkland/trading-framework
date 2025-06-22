@@ -1,0 +1,216 @@
+/* Table Theming with Semantic Tokens */
+/* Applies consistent dark/light theme to all data tables */
+
+/* Base table wrapper for theme variables */
+.table-themed {
+  /* Table color variables that auto-adjust with theme */
+  --table-bg: var(--surface-2);
+  --table-header-bg: var(--surface-3);
+  --table-row-hover-bg: var(--surface-3-hover);
+  --table-border: var(--border-subtle);
+  --table-text: var(--on-surface-2);
+  --table-text-muted: var(--on-surface-2-muted);
+  --table-shadow: var(--shadow-default);
+  
+  background-color: var(--table-bg);
+  border: 1px solid var(--table-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--table-shadow);
+}
+
+/* Table header styling */
+.table-themed thead th {
+  background-color: var(--table-header-bg);
+  color: var(--table-text);
+  font-weight: 600;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--table-border);
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Table body styling */
+.table-themed tbody tr {
+  background-color: var(--table-bg);
+  transition: background-color 150ms ease;
+}
+
+.table-themed tbody tr:hover {
+  background-color: var(--table-row-hover-bg);
+}
+
+/* Zebra striping for better readability */
+.table-themed tbody tr:nth-child(even) {
+  background-color: color-mix(in srgb, var(--table-bg) 96%, var(--on-surface-2) 4%);
+}
+
+.table-themed tbody tr:nth-child(even):hover {
+  background-color: var(--table-row-hover-bg);
+}
+
+.table-themed tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--table-border);
+  color: var(--table-text);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Last row no border */
+.table-themed tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status cells with proper contrast */
+.table-themed .status-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table-themed .status-pill {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.table-themed .status-pill.positive {
+  background-color: var(--status-positive-bg);
+  color: var(--status-positive-text);
+}
+
+.table-themed .status-pill.negative {
+  background-color: var(--status-negative-bg);
+  color: var(--status-negative-text);
+}
+
+.table-themed .status-pill.neutral {
+  background-color: var(--status-neutral-bg);
+  color: var(--status-neutral-text);
+}
+
+/* Number formatting */
+.table-themed .number-cell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.table-themed .number-positive {
+  color: var(--status-positive);
+}
+
+.table-themed .number-negative {
+  color: var(--status-negative);
+}
+
+/* Loading state */
+.table-themed.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Responsive table wrapper */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive .table-themed {
+  min-width: 600px;
+}
+
+/* Custom scrollbar for table container */
+.table-responsive {
+  scrollbar-color: var(--surface-3) var(--surface-1);
+  scrollbar-width: thin;
+}
+
+.table-responsive::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: var(--surface-1);
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: var(--surface-3);
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: var(--surface-3-hover);
+}
+
+/* Table caption/title */
+.table-caption {
+  padding: 16px;
+  background-color: var(--surface-2);
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: 600;
+  color: var(--on-surface-2);
+  text-align: left;
+}
+
+/* Empty state */
+.table-empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--on-surface-2-muted);
+  background-color: var(--surface-2);
+}
+
+.table-empty-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  opacity: 0.5;
+}
+
+/* Sortable headers */
+.table-themed th.sortable {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-right: 32px;
+}
+
+.table-themed th.sortable:hover {
+  background-color: var(--surface-3-hover);
+}
+
+.table-themed th.sortable::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid var(--on-surface-2-muted);
+  opacity: 0.5;
+}
+
+.table-themed th.sortable.sort-asc::after {
+  border-bottom: 4px solid var(--on-surface-2);
+  border-top: none;
+  opacity: 1;
+}
+
+.table-themed th.sortable.sort-desc::after {
+  border-top: 4px solid var(--on-surface-2);
+  border-bottom: none;
+  opacity: 1;
+}

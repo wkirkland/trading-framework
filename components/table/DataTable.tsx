@@ -219,9 +219,9 @@ export function DataTable<T extends Record<string, any>>({
   }
 
   return (
-    <div className={`data-table-container ${className}`}>
+    <div className={`table-responsive ${className}`}>
       <div className={`data-table-wrapper ${stickyHeader ? 'sticky-header' : ''}`}>
-        <table className="data-table">
+        <table className="table-themed data-table">
           <thead className="data-table-head">
             <tr>
               {columns.map((column) => (

@@ -1,4 +1,5 @@
 /* Import design tokens and theme */
+@import '../styles/semantic-tokens.css';
 @import '../styles/theme.css';
 @import '../styles/status-colors.css';
 @import '../styles/grid.css';
@@ -7,6 +8,7 @@
 @import '../styles/metric-card.css';
 @import '../styles/metric-grid.css';
 @import '../styles/gauge-chart.css';
+@import '../styles/table-theme.css';
 @import '../styles/data-table.css';
 @import '../styles/metric-table.css';
 @import '../styles/hover-effects.css';
