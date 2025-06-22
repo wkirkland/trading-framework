@@ -29,17 +29,17 @@ html, body {
   font-family: var(--font-family-sans);
   font-size: var(--font-size-base);
   line-height: var(--line-height-base);
-  color: var(--color-neutral-900);
-  background-color: var(--color-surface-primary);
+  color: var(--on-surface-1);
+  background-color: var(--surface-canvas);
   transition: color var(--duration-fast) var(--ease-standard), 
               background-color var(--duration-fast) var(--ease-standard);
 }
 
 /* Navigation Styles */
 nav {
-  background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--surface-1);
+  box-shadow: var(--shadow-default);
+  border-bottom: 1px solid var(--border-subtle);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -130,10 +130,12 @@ nav {
 }
 
 .card {
-  background: white;
+  background: var(--surface-2);
+  color: var(--on-surface-2);
   border-radius: 1rem;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-default);
   padding: 2rem;
+  border: 1px solid var(--border-subtle);
 }
 
 /* Typography */
@@ -195,9 +197,9 @@ p {
 }
 
 .btn-secondary {
-  border: 2px solid #d1d5db;
-  color: #374151;
-  background: white;
+  border: 2px solid var(--border-default);
+  color: var(--on-surface-2);
+  background: var(--surface-2);
 }
 
 .btn-secondary:hover {
@@ -256,9 +258,10 @@ p {
 
 select {
   padding: 0.5rem 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border-subtle);
   border-radius: 0.5rem;
-  background: white;
+  background: var(--surface-2);
+  color: var(--on-surface-2);
   font-size: 0.875rem;
   transition: all 0.2s;
 }
@@ -271,10 +274,11 @@ select:focus {
 
 /* Tables */
 .table-container {
-  background: white;
+  background: var(--surface-2);
   border-radius: 0.75rem;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-default);
+  border: 1px solid var(--border-subtle);
 }
 
 table {
@@ -350,7 +354,7 @@ tr:hover {
 
 .timing-coincident {
   background: #dbeafe;
-  color: #1e40af;
+  color: #1e3a8a;
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
   font-size: 0.75rem;
@@ -369,7 +373,7 @@ tr:hover {
 /* Frequency colors */
 .frequency-daily { color: #dc2626; font-weight: 600; }
 .frequency-weekly { color: #d97706; font-weight: 600; }
-.frequency-monthly { color: #2563eb; font-weight: 600; }
+.frequency-monthly { color: #1e40af; font-weight: 600; }
 .frequency-quarterly { color: #16a34a; font-weight: 600; }
 
 /* Category borders */
@@ -647,10 +651,11 @@ tr:hover {
 
 /* Enhanced metrics table */
 .enhanced-metrics-table {
-  background: white;
+  background: var(--surface-2);
   border-radius: 0.75rem;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-default);
+  border: 1px solid var(--border-subtle);
 }
 
 .enhanced-table-header {

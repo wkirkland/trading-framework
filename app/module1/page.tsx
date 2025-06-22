@@ -86,7 +86,7 @@ export default function Module1Page() {
 
           {/* Selected Thesis Info & Score */}
           <div className="md:col-span-12 lg:col-span-8 mt-4 md:mt-0 p-4 sm:p-6 bg-slate-50 dark:bg-slate-700/60 rounded-xl border border-slate-200 dark:border-slate-600">
-            <h2 className="text-xl font-semibold text-indigo-600 dark:text-indigo-400 mb-1">
+            <h2 className="text-xl font-semibold text-indigo-700 dark:text-indigo-400 mb-1">
               Analysis for: {selectedThesis.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-300 mb-3 leading-relaxed italic">

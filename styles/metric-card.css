@@ -166,7 +166,7 @@
 .metric-name {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  color: var(--color-neutral-900);
+  color: var(--on-surface-2);
   line-height: 1.2;
   margin: 0;
   overflow: hidden;
@@ -191,7 +191,7 @@
 .value-number {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
-  color: var(--color-neutral-900);
+  color: var(--on-surface-2);
   line-height: 1;
 }
 
@@ -277,21 +277,21 @@
 }
 
 .metric-pill.signal-pill.confirm {
-  background-color: var(--status-confirm-bg);
-  color: var(--status-confirm-text);
-  border-color: var(--status-confirm-border);
+  background-color: var(--status-positive-bg);
+  color: var(--status-positive-text);
+  border-color: var(--status-positive);
 }
 
 .metric-pill.signal-pill.contradict {
-  background-color: var(--status-contradict-bg);
-  color: var(--status-contradict-text);
-  border-color: var(--status-contradict-border);
+  background-color: var(--status-negative-bg);
+  color: var(--status-negative-text);
+  border-color: var(--status-negative);
 }
 
 .metric-pill.signal-pill.neutral {
   background-color: var(--status-neutral-bg);
   color: var(--status-neutral-text);
-  border-color: var(--status-neutral-border);
+  border-color: var(--status-neutral);
 }
 
 .metric-pill.impact-pill.high {
@@ -312,7 +312,7 @@
 /* Reasoning text */
 .metric-reasoning {
   font-size: var(--font-size-xs);
-  color: var(--color-neutral-600);
+  color: var(--on-surface-2-muted);
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;

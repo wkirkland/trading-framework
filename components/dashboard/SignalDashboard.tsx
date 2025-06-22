@@ -96,7 +96,7 @@ export default function SignalDashboard() {
             gap: '1rem',
             marginTop: '1rem',
             fontSize: '0.9rem',
-            color: '#6b7280'
+            color: '#374151'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <div style={{ 
@@ -135,7 +135,7 @@ export default function SignalDashboard() {
                 padding: '0.25rem 0.75rem',
                 fontSize: '0.8rem',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                color: loading ? '#9ca3af' : '#374151'
+                color: loading ? '#6b7280' : '#1f2937'
               }}
             >
               {loading ? 'Refreshing...' : 'Refresh Analysis'}
@@ -156,15 +156,13 @@ export default function SignalDashboard() {
           <select
             value={selectedThesis}
             onChange={(e) => setSelectedThesis(e.target.value)}
+            className="bg-surface-2 text-on-surface-2 border border-border-subtle"
             style={{
               padding: '0.75rem 1.25rem',
               fontSize: '1.1rem',
-              border: 'none',
               borderRadius: '0.5rem',
-              background: 'white',
               minWidth: '300px',
-              fontWeight: '600',
-              color: '#1f2937'
+              fontWeight: '600'
             }}
           >
             {thesisOptions.map((thesis) => (
@@ -202,7 +200,7 @@ export default function SignalDashboard() {
                 borderRadius: 'var(--radius-full)',
                 border: 'none',
                 background: viewMode === 'cards' ? 'var(--color-primary-500)' : 'transparent',
-                color: viewMode === 'cards' ? 'white' : 'var(--color-neutral-700)',
+                color: viewMode === 'cards' ? 'white' : 'var(--color-neutral-900)',
                 fontWeight: 'var(--font-weight-medium)',
                 fontSize: 'var(--font-size-sm)',
                 cursor: 'pointer',
@@ -224,7 +222,7 @@ export default function SignalDashboard() {
                 borderRadius: 'var(--radius-full)',
                 border: 'none',
                 background: viewMode === 'table' ? 'var(--color-primary-500)' : 'transparent',
-                color: viewMode === 'table' ? 'white' : 'var(--color-neutral-700)',
+                color: viewMode === 'table' ? 'white' : 'var(--color-neutral-900)',
                 fontWeight: 'var(--font-weight-medium)',
                 fontSize: 'var(--font-size-sm)',
                 cursor: 'pointer',
@@ -268,7 +266,7 @@ export default function SignalDashboard() {
                   margin: '0 0 var(--spacing-3) 0',
                   fontSize: 'var(--font-size-sm)',
                   fontWeight: 'var(--font-weight-semibold)',
-                  color: 'var(--color-neutral-700)',
+                  color: 'var(--color-neutral-900)',
                   textAlign: 'center'
                 }}>
                   Category Breakdown
@@ -458,7 +456,7 @@ export default function SignalDashboard() {
         )}
 
         {/* Footer with live data count */}
-        <div style={{ textAlign: 'center', marginTop: '2rem', color: '#666' }}>
+        <div style={{ textAlign: 'center', marginTop: '2rem', color: '#374151' }}>
           <p style={{ fontSize: '0.9rem' }}>
             Analysis powered by live Federal Reserve economic data (FRED)
           </p>

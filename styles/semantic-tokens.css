@@ -20,21 +20,21 @@
   --brand-primary-hover: #2563eb;
   --brand-accent: #06b6d4;
   
-  /* Semantic status colors - WCAG AA on both light/dark */
-  --status-positive: #059669;
-  --status-positive-bg: #dcfce7;
-  --status-positive-text: #14532d;
-  --status-negative: #dc2626;
-  --status-negative-bg: #fef2f2;
-  --status-negative-text: #7f1d1d;
-  --status-neutral: #d97706;
-  --status-neutral-bg: #fefbeb;
-  --status-neutral-text: #78350f;
+  /* Semantic status colors - Toned down intensity for light mode */
+  --status-positive: #16a34a;
+  --status-positive-bg: #f0fdf4;
+  --status-positive-text: #052e16;   /* Much darker green text */
+  --status-negative: #e11d48;
+  --status-negative-bg: #fef7f7;
+  --status-negative-text: #450a0a;   /* Much darker red text */
+  --status-neutral: #ea580c;
+  --status-neutral-bg: #fefaf5;
+  --status-neutral-text: #451a03;    /* Much darker amber text */
   
-  /* Data visualization */
-  --data-accent-1: #10b981; /* emerald - for positives */
-  --data-accent-2: #f59e0b; /* amber - for warnings */
-  --data-accent-3: #ef4444; /* red - for negatives */
+  /* Data visualization - Toned down intensity */
+  --data-accent-1: #16a34a; /* emerald - less intense for positives */
+  --data-accent-2: #ea580c; /* orange - less intense for warnings */
+  --data-accent-3: #e11d48; /* rose - less intense for negatives */
   
   /* Borders and dividers */
   --border-subtle: #e2e8f0;
@@ -50,38 +50,38 @@
 .dark {
   /* Dark theme semantic tokens */
   --surface-canvas: #0d1117;
-  --surface-1: #161b22;          /* nav/sidebar - darker for contrast */
-  --surface-2: #1c2128;          /* card backgrounds */
-  --surface-3: #262c36;          /* table headers, hover states */
-  --surface-3-hover: #2d3748;
+  --surface-1: #0d1117;          /* nav/sidebar - much darker for better contrast */
+  --surface-2: #161b22;          /* card backgrounds - much darker */
+  --surface-3: #1c2128;          /* table headers, hover states */
+  --surface-3-hover: #262c36;
   
-  /* Text colors - WCAG AA compliant on dark backgrounds */
-  --on-surface-1: #f1f5f9;       /* 4.7:1 ratio on surface-1 */
-  --on-surface-1-muted: #cbd5e1; /* 3.8:1 - acceptable for secondary */
-  --on-surface-1-hover: #ffffff; /* pure white for hover */
-  --on-surface-2: #e2e8f0;       /* text on cards */
-  --on-surface-2-muted: #94a3b8;
+  /* Text colors - Darker text for better readability in dark mode */
+  --on-surface-1: #94a3b8;       /* Much darker gray for sidebar text */
+  --on-surface-1-muted: #64748b; /* Even darker muted text */
+  --on-surface-1-hover: #cbd5e1; /* Lighter on hover */
+  --on-surface-2: #94a3b8;       /* Darker text on dark cards */
+  --on-surface-2-muted: #64748b;
   
   /* Brand colors adjusted for dark mode */
   --brand-primary: #60a5fa;
   --brand-primary-hover: #3b82f6;
   --brand-accent: #22d3ee;
   
-  /* Status colors - desaturated for dark mode, maintain contrast */
-  --status-positive: #34d399;
-  --status-positive-bg: #064e3b;
-  --status-positive-text: #6ee7b7;
+  /* Status colors - Toned down and readable in dark mode */
+  --status-positive: #10b981;
+  --status-positive-bg: #052e16;     /* Very dark green background */
+  --status-positive-text: #64748b;   /* Darker gray text instead of white */
   --status-negative: #f87171;
-  --status-negative-bg: #7f1d1d;
-  --status-negative-text: #fca5a5;
-  --status-neutral: #fbbf24;
-  --status-neutral-bg: #78350f;
-  --status-neutral-text: #fde68a;
+  --status-negative-bg: #450a0a;     /* Very dark red background */
+  --status-negative-text: #64748b;   /* Darker gray text instead of white */
+  --status-neutral: #fb923c;
+  --status-neutral-bg: #451a03;      /* Very dark amber background */
+  --status-neutral-text: #64748b;    /* Darker gray text instead of white */
   
-  /* Data visualization - reduced saturation */
+  /* Data visualization - reduced saturation for dark mode */
   --data-accent-1: #10b981; /* emerald - slightly less intense */
-  --data-accent-2: #f59e0b; /* amber */
-  --data-accent-3: #ef4444; /* red */
+  --data-accent-2: #fb923c; /* orange - less intense */
+  --data-accent-3: #f87171; /* rose - less intense */
   
   /* Borders and dividers */
   --border-subtle: #30363d;
