@@ -48,11 +48,22 @@ async function fetchLiveApiData(): Promise<Record<string, LiveMetricData>> {
   
   return fallbackService.withFallback(
     async () => {
-      // Fetch from API
-      const response = await fetch('/api/fred-data'); // Your API endpoint
-      console.log('📊 Received response:', response.status, response.statusText);
+      // Fetch from API with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+      
+      try {
+        const response = await fetch('/api/fred-data', {
+          signal: controller.signal,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          }
+        });
+        clearTimeout(timeoutId);
+        console.log('📊 Received response:', response.status, response.statusText);
 
-      if (!response.ok) {
+        if (!response.ok) {
         // Attempt to get more detailed error from response body if possible
         let errorMsg = `Network error: ${response.status} ${response.statusText}`;
         try {
@@ -88,8 +99,18 @@ async function fetchLiveApiData(): Promise<Record<string, LiveMetricData>> {
         }
       });
 
-      console.log('✅ TanStack Query: Data fetched and stored successfully.');
-      return result.data;
+        console.log('✅ TanStack Query: Data fetched and stored successfully.');
+        return result.data;
+      
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          console.error('❌ TanStack Query: Request timed out after 60 seconds');
+          throw new Error('Request timed out - API took too long to respond');
+        }
+        console.error('❌ TanStack Query: Fetch error -', fetchError);
+        throw fetchError;
+      }
     },
     'AllMetrics',
     { retries: 2, retryDelay: 2000 }
@@ -117,9 +138,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                                       // Economic data doesn't need high frequency updates
     refetchOnWindowFocus: false,      // Don't refetch when window regains focus (too aggressive)
     refetchOnMount: true,             // Refetch when component mounts
-    // placeholderData: {}, // Optional: provide some initial data (e.g. empty object)
-    // keepPreviousData: true, // Optional: useful for UX to show old data while new is fetching
-    retry: 2, // Optional: retry failed queries 2 times
+    retry: 3,                         // Retry failed queries 3 times
+    retryDelay: 1000,                 // Wait 1 second between retries
   });
 
   // Ensure liveData is always an object, even if query returns undefined initially
