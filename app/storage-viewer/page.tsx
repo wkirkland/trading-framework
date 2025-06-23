@@ -335,7 +335,7 @@ function StorageViewerContent() {
 export default function StorageViewerPage() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <ErrorBoundary fallback={<div className="text-red-500 p-4">Error loading storage viewer</div>}>
+      <ErrorBoundary fallback={() => <div className="text-red-500 p-4">Error loading storage viewer</div>}>
         <StorageViewerContent />
       </ErrorBoundary>
     </div>

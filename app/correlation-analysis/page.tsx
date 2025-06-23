@@ -9,7 +9,7 @@ import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 export default function CorrelationAnalysisPage() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <ErrorBoundary fallback={<div className="text-red-500 p-4">Error loading correlation analysis</div>}>
+      <ErrorBoundary fallback={() => <div className="text-red-500 p-4">Error loading correlation analysis</div>}>
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
