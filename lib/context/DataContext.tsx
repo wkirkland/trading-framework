@@ -4,6 +4,8 @@
 import React, { createContext, useContext, useCallback, useMemo } from 'react';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
+import { fallbackService } from '@/lib/services/fallbackService';
+
 // --- Interfaces (largely the same, but `lastUpdated` in LiveMetricData and `timestamp` in LiveDataResponse
 // --- might become redundant if you solely rely on React Query's `dataUpdatedAt`)
 
@@ -13,6 +15,9 @@ export interface LiveMetricData {
   date: string;
   change?: number;
   lastUpdated: string; // Provided by your API, keep if still useful, else can remove
+  source?: string;
+  isFallback?: boolean;
+  error?: string;
 }
 
 export interface LiveDataResponse {
@@ -39,31 +44,48 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 // This is the function that React Query will call to fetch data
 async function fetchLiveApiData(): Promise<Record<string, LiveMetricData>> {
   console.log('🔄 TanStack Query: Fetching live API data via fetchLiveApiData()...', new Date().toISOString());
-  const response = await fetch('/api/fred-data'); // Your API endpoint
+  
+  return fallbackService.withFallback(
+    async () => {
+      const response = await fetch('/api/fred-data'); // Your API endpoint
 
-  if (!response.ok) {
-    // Attempt to get more detailed error from response body if possible
-    let errorMsg = `Network error: ${response.status} ${response.statusText}`;
-    try {
-      const errorData = await response.json();
-      errorMsg = errorData.error || errorData.message || errorMsg;
-    } catch {
-      // Ignore if response body isn't JSON
-    }
-    console.error('❌ TanStack Query: Network response was not ok.', errorMsg);
-    throw new Error(errorMsg);
-  }
+      if (!response.ok) {
+        // Attempt to get more detailed error from response body if possible
+        let errorMsg = `Network error: ${response.status} ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.error || errorData.message || errorMsg;
+        } catch {
+          // Ignore if response body isn't JSON
+        }
+        console.error('❌ TanStack Query: Network response was not ok.', errorMsg);
+        throw new Error(errorMsg);
+      }
 
-  const result: LiveDataResponse = await response.json();
+      const result: LiveDataResponse = await response.json();
 
-  if (!result.success || !result.data) {
-    const apiErrorMsg = result.error || 'API returned unsuccessful or no data';
-    console.error('❌ TanStack Query: API error -', apiErrorMsg);
-    throw new Error(apiErrorMsg);
-  }
+      if (!result.success || !result.data) {
+        const apiErrorMsg = result.error || 'API returned unsuccessful or no data';
+        console.error('❌ TanStack Query: API error -', apiErrorMsg);
+        throw new Error(apiErrorMsg);
+      }
 
-  console.log('✅ TanStack Query: Data fetched successfully.');
-  return result.data;
+      // Cache successful data for each metric
+      Object.entries(result.data).forEach(([metricName, data]) => {
+        if (data && !data.isFallback) {
+          fallbackService.cacheData(metricName, {
+            ...data,
+            source: data.source || 'API'
+          });
+        }
+      });
+
+      console.log('✅ TanStack Query: Data fetched successfully.');
+      return result.data;
+    },
+    'AllMetrics',
+    { retries: 2, retryDelay: 2000 }
+  ) as Promise<Record<string, LiveMetricData>>;
 }
 
 export function DataProvider({ children }: { children: React.ReactNode }) {

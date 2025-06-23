@@ -9,14 +9,15 @@ import { DataFreshnessIndicator } from '@/components/monitoring/DataFreshnessInd
 // Define props for the component
 interface MetricsTableProps {
   metricsForTable: SignalData[];
+  loading?: boolean;
+  error?: string;
+  onRetry?: () => void;
   // Optional: pass loading/error/lastFetched/fetchData from parent if needed here
-  // isLoading?: boolean;
-  // dataError?: any;
   // lastDataFetched?: Date | null;
   // onRefreshData?: () => void;
 }
 
-export function MetricsTable({ metricsForTable }: MetricsTableProps) {
+export function MetricsTable({ metricsForTable, loading, error, onRetry }: MetricsTableProps) {
   // Filters are removed for PoC simplicity as the parent now controls the metric list (20 PoC metrics)
   // Summary stats are also removed as they were based on all metricsData
 
@@ -34,10 +35,71 @@ export function MetricsTable({ metricsForTable }: MetricsTableProps) {
     return 'bg-gray-100 dark:bg-gray-900/20 text-gray-700 dark:text-gray-300';
   };
 
+  // Error state
+  if (error) {
+    return (
+      <div className="card p-6 bg-surface-2 shadow-lg rounded-lg">
+        <div style={{ textAlign: 'center', padding: '2rem' }}>
+          <div style={{ color: 'var(--status-negative)', marginBottom: '1rem' }}>
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--on-surface-2)' }}>Unable to Load Metrics</h3>
+          <p style={{ margin: '0 0 1rem 0', color: 'var(--on-surface-2-muted)' }}>{error}</p>
+          {onRetry && (
+            <button 
+              onClick={onRetry}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: 'var(--color-primary-500)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer'
+              }}
+            >
+              Retry Loading
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="card p-6 bg-surface-2 shadow-lg rounded-lg">
+        <div style={{ textAlign: 'center', padding: '2rem' }}>
+          <div style={{ 
+            width: '48px', 
+            height: '48px', 
+            border: '3px solid var(--border-subtle)',
+            borderTop: '3px solid var(--color-primary-500)',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 1rem'
+          }} />
+          <p style={{ color: 'var(--on-surface-2-muted)' }}>Loading metrics...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state
   if (!metricsForTable || metricsForTable.length === 0) {
     return (
       <div className="card p-6 bg-surface-2 shadow-lg rounded-lg">
-        <p className="text-on-surface-2-muted italic">No metrics to display for the selected thesis or data is still loading.</p>
+        <div style={{ textAlign: 'center', padding: '2rem' }}>
+          <div style={{ color: 'var(--on-surface-2-muted)', marginBottom: '1rem' }}>
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 00-2 2h-2a2 2 0 00-2-2z" />
+            </svg>
+          </div>
+          <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--on-surface-2)' }}>No Metrics Available</h3>
+          <p style={{ color: 'var(--on-surface-2-muted)' }}>No metrics to display for the selected thesis or data is still loading.</p>
+        </div>
       </div>
     );
   }

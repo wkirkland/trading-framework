@@ -5,6 +5,7 @@ import React from 'react';
 
 import { MetricTooltip } from '@/components/ui/Tooltip';
 import { DataFreshnessIndicator } from '@/components/monitoring/DataFreshnessIndicator';
+import { MetricErrorBoundary } from '@/components/error/MetricErrorBoundary';
 
 export interface MetricCardData {
   name: string;
@@ -20,6 +21,9 @@ export interface MetricCardData {
   isLive?: boolean;
   sparklineData?: number[];
   lastUpdated?: Date | null;
+  source?: string;
+  isFallback?: boolean;
+  error?: string;
 }
 
 interface MetricCardProps {
@@ -130,12 +134,20 @@ export function MetricCard({
   };
 
   return (
-    <div
-      className={`metric-card ${sizeClasses[size]} ${signal} ${className}`}
-      onClick={onClick}
-      role={onClick ? 'button' : undefined}
-      tabIndex={onClick ? 0 : undefined}
+    <MetricErrorBoundary
+      metricName={name}
+      fallbackData={{
+        value: data.value,
+        change: data.change,
+        lastUpdated: data.lastUpdated
+      }}
     >
+      <div
+        className={`metric-card ${sizeClasses[size]} ${signal} ${data.isFallback ? 'fallback' : ''} ${className}`}
+        onClick={onClick}
+        role={onClick ? 'button' : undefined}
+        tabIndex={onClick ? 0 : undefined}
+      >
       {/* Header with icon and live indicator */}
       <div className="metric-card-header">
         <div className="metric-card-icon-container">
@@ -222,8 +234,18 @@ export function MetricCard({
         {/* Footer with next update */}
         <div className="metric-card-footer">
           <span className="next-update">Next: {nextUpdate}</span>
+          {data.isFallback && (
+            <span className="fallback-indicator" style={{ 
+              fontSize: '0.65rem', 
+              color: 'var(--status-warning)', 
+              marginLeft: '0.5rem' 
+            }}>
+              Fallback Data
+            </span>
+          )}
         </div>
       </div>
-    </div>
+      </div>
+    </MetricErrorBoundary>
   );
 }
