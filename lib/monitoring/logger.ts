@@ -34,11 +34,20 @@ class Logger {
   };
 
   constructor(config?: Partial<LoggerConfig>) {
-    const env = getCachedEnv();
+    // Only get environment info on server side
+    let nodeEnv = 'development';
+    if (typeof window === 'undefined') {
+      try {
+        const env = getCachedEnv();
+        nodeEnv = env.nodeEnv;
+      } catch {
+        nodeEnv = 'production'; // Default to production settings for safety
+      }
+    }
     
     this.config = {
-      level: env.nodeEnv === 'production' ? 'info' : 'debug',
-      format: env.nodeEnv === 'production' ? 'json' : 'pretty',
+      level: nodeEnv === 'production' ? 'info' : 'debug',
+      format: nodeEnv === 'production' ? 'json' : 'pretty',
       redactFields: ['password', 'token', 'apiKey', 'api_key', 'secret', 'authorization'],
       enableConsole: true,
       ...config,

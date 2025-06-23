@@ -74,9 +74,21 @@ class ErrorTracker {
   }
 
   captureError(error: Error, context: Partial<ErrorContext> = {}, severity: ErrorReport['severity'] = 'medium'): string {
-    const env = getCachedEnv();
     const id = this.generateId();
     const timestamp = new Date().toISOString();
+
+    // Only get environment info on server side
+    let environment = 'unknown';
+    if (typeof window === 'undefined') {
+      try {
+        const env = getCachedEnv();
+        environment = env.nodeEnv;
+      } catch {
+        environment = 'server-error';
+      }
+    } else {
+      environment = 'client';
+    }
 
     const errorInfo: ErrorInfo = {
       name: error.name,
@@ -88,8 +100,8 @@ class ErrorTracker {
 
     const fullContext: ErrorContext = {
       component: 'UNKNOWN',
-      environment: env.nodeEnv,
-      version: process.env.npm_package_version || '1.0.0',
+      environment,
+      version: typeof window === 'undefined' ? (process.env.npm_package_version || '1.0.0') : '1.0.0',
       timestamp,
       ...context,
     };
