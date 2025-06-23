@@ -5,6 +5,7 @@ import React, { createContext, useContext, useCallback, useMemo } from 'react';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 import { fallbackService } from '@/lib/services/fallbackService';
+import { getStorageService } from '@/lib/services/storageService';
 
 // --- Interfaces (largely the same, but `lastUpdated` in LiveMetricData and `timestamp` in LiveDataResponse
 // --- might become redundant if you solely rely on React Query's `dataUpdatedAt`)
@@ -45,11 +46,30 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 async function fetchLiveApiData(): Promise<Record<string, LiveMetricData>> {
   console.log('🔄 TanStack Query: Fetching live API data via fetchLiveApiData()...', new Date().toISOString());
   
+  const storageService = getStorageService();
+  
   return fallbackService.withFallback(
     async () => {
+      // First, try to get cached data from local storage
+      const cachedData = await storageService.getAllCachedMetricsData();
+      
+      // If we have sufficient cached data, use it and skip API call
+      const cachedMetricCount = Object.keys(cachedData).length;
+      if (cachedMetricCount > 10) { // Arbitrary threshold - at least half the POC metrics
+        console.log(`📦 Using ${cachedMetricCount} cached metrics from local storage`);
+        return cachedData;
+      }
+
+      // Otherwise, fetch from API
       const response = await fetch('/api/fred-data'); // Your API endpoint
 
       if (!response.ok) {
+        // If API fails, try to use whatever cached data we have
+        if (cachedMetricCount > 0) {
+          console.log(`🔄 API failed, falling back to ${cachedMetricCount} cached metrics`);
+          return cachedData;
+        }
+        
         // Attempt to get more detailed error from response body if possible
         let errorMsg = `Network error: ${response.status} ${response.statusText}`;
         try {
@@ -65,22 +85,36 @@ async function fetchLiveApiData(): Promise<Record<string, LiveMetricData>> {
       const result: LiveDataResponse = await response.json();
 
       if (!result.success || !result.data) {
+        // If API response is invalid, use cached data if available
+        if (cachedMetricCount > 0) {
+          console.log(`🔄 Invalid API response, falling back to ${cachedMetricCount} cached metrics`);
+          return cachedData;
+        }
+        
         const apiErrorMsg = result.error || 'API returned unsuccessful or no data';
         console.error('❌ TanStack Query: API error -', apiErrorMsg);
         throw new Error(apiErrorMsg);
       }
 
-      // Cache successful data for each metric
-      Object.entries(result.data).forEach(([metricName, data]) => {
-        if (data && !data.isFallback) {
-          fallbackService.cacheData(metricName, {
-            ...data,
-            source: data.source || 'API'
+      // Store successful API data in both fallback service and local storage
+      await Promise.all([
+        // Store in fallback service cache (memory)
+        Promise.resolve().then(() => {
+          Object.entries(result.data).forEach(([metricName, data]) => {
+            if (data && !data.isFallback) {
+              fallbackService.cacheData(metricName, {
+                ...data,
+                source: data.source || 'API'
+              });
+            }
           });
-        }
-      });
+        }),
+        
+        // Store in local storage (persistent)
+        storageService.storeMetricsData(result.data)
+      ]);
 
-      console.log('✅ TanStack Query: Data fetched successfully.');
+      console.log('✅ TanStack Query: Data fetched and stored successfully.');
       return result.data;
     },
     'AllMetrics',
