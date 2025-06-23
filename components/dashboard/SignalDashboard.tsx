@@ -96,7 +96,7 @@ export default function SignalDashboard() {
             gap: '1rem',
             marginTop: '1rem',
             fontSize: '0.9rem',
-            color: '#374151'
+            color: 'var(--on-surface-2-muted)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <div style={{ 
@@ -135,7 +135,7 @@ export default function SignalDashboard() {
                 padding: '0.25rem 0.75rem',
                 fontSize: '0.8rem',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                color: loading ? '#6b7280' : '#1f2937'
+                color: loading ? 'var(--on-surface-2-muted)' : 'var(--on-surface-2)'
               }}
             >
               {loading ? 'Refreshing...' : 'Refresh Analysis'}
@@ -200,7 +200,7 @@ export default function SignalDashboard() {
                 borderRadius: 'var(--radius-full)',
                 border: 'none',
                 background: viewMode === 'cards' ? 'var(--color-primary-500)' : 'transparent',
-                color: viewMode === 'cards' ? 'white' : 'var(--color-neutral-900)',
+                color: viewMode === 'cards' ? 'white' : 'var(--on-surface-2)',
                 fontWeight: 'var(--font-weight-medium)',
                 fontSize: 'var(--font-size-sm)',
                 cursor: 'pointer',
@@ -222,7 +222,7 @@ export default function SignalDashboard() {
                 borderRadius: 'var(--radius-full)',
                 border: 'none',
                 background: viewMode === 'table' ? 'var(--color-primary-500)' : 'transparent',
-                color: viewMode === 'table' ? 'white' : 'var(--color-neutral-900)',
+                color: viewMode === 'table' ? 'white' : 'var(--on-surface-2)',
                 fontWeight: 'var(--font-weight-medium)',
                 fontSize: 'var(--font-size-sm)',
                 cursor: 'pointer',
@@ -266,7 +266,7 @@ export default function SignalDashboard() {
                   margin: '0 0 var(--spacing-3) 0',
                   fontSize: 'var(--font-size-sm)',
                   fontWeight: 'var(--font-weight-semibold)',
-                  color: 'var(--color-neutral-900)',
+                  color: 'var(--on-surface-2)',
                   textAlign: 'center'
                 }}>
                   Category Breakdown
@@ -456,7 +456,7 @@ export default function SignalDashboard() {
         )}
 
         {/* Footer with live data count */}
-        <div style={{ textAlign: 'center', marginTop: '2rem', color: '#374151' }}>
+        <div style={{ textAlign: 'center', marginTop: '2rem', color: 'var(--on-surface-2-muted)' }}>
           <p style={{ fontSize: '0.9rem' }}>
             Analysis powered by live Federal Reserve economic data (FRED)
           </p>

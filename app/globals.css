@@ -142,7 +142,7 @@ nav {
 h1 {
   font-size: 2.5rem;
   font-weight: 300;
-  color: #1f2937;
+  color: var(--on-surface-2);
   text-align: center;
   margin-bottom: 1rem;
 }
@@ -150,26 +150,33 @@ h1 {
 h2 {
   font-size: 2rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--on-surface-2);
   margin-bottom: 1.5rem;
 }
 
 h3 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--on-surface-2);
   margin-bottom: 1rem;
 }
 
+h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--on-surface-2);
+  margin-bottom: 0.75rem;
+}
+
 p {
-  color: #6b7280;
+  color: var(--on-surface-2-muted);
   margin-bottom: 1rem;
   font-size: 1.1rem;
 }
 
 .subtitle {
   text-align: center;
-  color: #6b7280;
+  color: var(--on-surface-2-muted);
   font-size: 1.2rem;
   margin-bottom: 2rem;
 }

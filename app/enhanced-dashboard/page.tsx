@@ -99,7 +99,7 @@ export default function EnhancedSignalDashboard() {
             gap: '1rem',
             marginTop: '1rem',
             fontSize: '0.9rem',
-            color: '#6b7280'
+            color: 'var(--on-surface-2-muted)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <div style={{ 
@@ -127,7 +127,7 @@ export default function EnhancedSignalDashboard() {
                 padding: '0.25rem 0.75rem',
                 fontSize: '0.8rem',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                color: loading ? '#9ca3af' : '#374151'
+                color: loading ? 'var(--on-surface-2-muted)' : 'var(--on-surface-2)'
               }}
             >
               {loading ? 'Refreshing...' : 'Refresh Analysis'}
@@ -204,10 +204,10 @@ export default function EnhancedSignalDashboard() {
               fontSize: '1.1rem',
               border: 'none',
               borderRadius: '0.5rem',
-              background: 'white',
+              background: 'var(--surface-2)',
               minWidth: '300px',
               fontWeight: '600',
-              color: '#1f2937',
+              color: 'var(--on-surface-2)',
               width: '100%',
               maxWidth: '600px'
             }}
@@ -445,7 +445,7 @@ export default function EnhancedSignalDashboard() {
                         {metric.formatted || (typeof metric.value === 'number' ? metric.value.toFixed(2) : metric.value)}
                       </strong>
                     ) : (
-                      <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>No data</span>
+                      <span style={{ color: 'var(--on-surface-2-muted)', fontStyle: 'italic' }}>No data</span>
                     )}
                   </td>
                   <td>
@@ -455,8 +455,8 @@ export default function EnhancedSignalDashboard() {
                   </td>
                   <td>
                     <strong style={{ 
-                      color: metric.currentSignal === 'confirm' ? '#10b981' : 
-                             metric.currentSignal === 'contradict' ? '#ef4444' : '#6b7280'
+                      color: metric.currentSignal === 'confirm' ? 'var(--status-positive)' : 
+                             metric.currentSignal === 'contradict' ? 'var(--status-negative)' : 'var(--on-surface-2-muted)'
                     }}>
                       {metric.currentSignal === 'confirm' ? 'SUPPORTS' :
                        metric.currentSignal === 'contradict' ? 'CONTRADICTS' : 'NEUTRAL'}
@@ -468,8 +468,8 @@ export default function EnhancedSignalDashboard() {
                     </span>
                   </td>
                   <td style={{ 
-                    color: metric.change.includes('↑') ? '#10b981' : 
-                           metric.change.includes('↓') ? '#ef4444' : '#6b7280',
+                    color: metric.change.includes('↑') ? 'var(--status-positive)' : 
+                           metric.change.includes('↓') ? 'var(--status-negative)' : 'var(--on-surface-2-muted)',
                     fontWeight: '600'
                   }}>
                     {metric.change}
@@ -487,7 +487,7 @@ export default function EnhancedSignalDashboard() {
         </div>
 
         {/* Footer */}
-        <div style={{ textAlign: 'center', marginTop: '2rem', color: '#666' }}>
+        <div style={{ textAlign: 'center', marginTop: '2rem', color: 'var(--on-surface-2-muted)' }}>
           <p style={{ fontSize: '0.9rem' }}>
             Enhanced analysis powered by FRED Economic Data + Alpha Vantage Market Data
           </p>
