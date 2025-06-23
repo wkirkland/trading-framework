@@ -55,12 +55,12 @@
   --surface-3: #1c2128;          /* table headers, hover states */
   --surface-3-hover: #262c36;
   
-  /* Text colors - Darker text for better readability in dark mode */
-  --on-surface-1: #94a3b8;       /* Much darker gray for sidebar text */
+  /* Text colors - Balanced for readability in dark mode */
+  --on-surface-1: #94a3b8;       /* Darker gray for sidebar text */
   --on-surface-1-muted: #64748b; /* Even darker muted text */
   --on-surface-1-hover: #cbd5e1; /* Lighter on hover */
-  --on-surface-2: #94a3b8;       /* Darker text on dark cards */
-  --on-surface-2-muted: #64748b;
+  --on-surface-2: #e2e8f0;       /* Lighter text for headers and main content */
+  --on-surface-2-muted: #94a3b8; /* Medium gray for secondary text */
   
   /* Brand colors adjusted for dark mode */
   --brand-primary: #60a5fa;
