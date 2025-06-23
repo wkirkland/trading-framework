@@ -17,7 +17,7 @@ export default function HomePage() {
         {/* Overview Grid */}
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-number">9</div>
+            <div className="stat-number">12</div>
             <div className="stat-label">Analysis Modules</div>
           </div>
           <div className="stat-card">
