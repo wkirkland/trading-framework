@@ -94,13 +94,13 @@ interface CacheEntry {
   lastAccessed: string;
 }
 
-interface StorageFiles {
-  metrics: StoredMetric[];
-  metricData: StoredMetricData[];
-  freshness: StoredFreshness[];
-  apiHealth: StoredApiHealth[];
-  cache: CacheEntry[];
-}
+// interface StorageFiles {
+//   metrics: StoredMetric[];
+//   metricData: StoredMetricData[];
+//   freshness: StoredFreshness[];
+//   apiHealth: StoredApiHealth[];
+//   cache: CacheEntry[];
+// }
 
 class FileStorage {
   private isInitialized = false;
@@ -255,7 +255,7 @@ class FileStorage {
 
       // Trim to max history per metric
       const trimmedData: StoredMetricData[] = [];
-      for (const [name, items] of metricDataByName) {
+      for (const [, items] of metricDataByName) {
         const sorted = items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         trimmedData.push(...sorted.slice(0, this.maxHistoryPerMetric));
       }
