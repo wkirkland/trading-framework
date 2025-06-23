@@ -1,5 +1,6 @@
 // lib/services/multiSourceDataService.ts
 import type { Metric as PocMetricConfig, AlphaVantageFunctionParams } from '@/lib/data/metrics'; // Import PoC metric config
+import { apiHealthService } from '@/lib/services/apiHealthService';
 
 export interface MetricValue { // Exporting for use in route.ts
     value: number | null;
@@ -98,15 +99,27 @@ class MultiSourceDataService {
       console.log(`AlphaVantage Service: Fetching ${metricName} using function ${params.function} for symbol ${params.symbol || 'N/A'}`);
     }
 
+    const startTime = Date.now();
+    
     try {
       const response = await fetch(url);
+      const responseTime = Date.now() - startTime;
+      
       if (!response.ok) {
         const errorBody = await response.text();
+        const errorMessage = `API Error ${response.status}: ${errorBody}`;
         console.warn(`AlphaVantage Service: API error for ${metricName} (${symbolForQuote || 'N/A'}): ${response.status}. Body: ${errorBody}`);
+        
+        // Record failed API call
+        apiHealthService.recordApiCall('alphaVantage', false, responseTime, errorMessage);
+        
         return this.getMarketFallbackData(metricName, `API Error ${response.status}`);
       }
 
       const data = await response.json();
+      
+      // Record successful API call (will be updated if data parsing fails)
+      apiHealthService.recordApiCall('alphaVantage', true, responseTime);
 
       if (data['Error Message'] || data['Note']) {
         const note = data['Note'];
@@ -178,7 +191,13 @@ class MultiSourceDataService {
       return result;
 
     } catch (error: any) {
+      const responseTime = Date.now() - startTime;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
       console.error(`AlphaVantage Service: Error fetching/parsing for ${metricName}:`, error);
+      
+      // Record failed API call
+      apiHealthService.recordApiCall('alphaVantage', false, responseTime, errorMessage);
       return this.getMarketFallbackData(metricName, error.message || "Fetch/Parse error");
     }
   }

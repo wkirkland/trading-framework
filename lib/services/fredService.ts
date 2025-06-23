@@ -1,6 +1,7 @@
 // lib/services/fredService.ts
 
 import { getFredClient, FredRequestError, FredAuthError } from '@/lib/http/fredClient';
+import { apiHealthService } from '@/lib/services/apiHealthService';
 
 interface FredDataPoint {
   date: string;
@@ -81,13 +82,31 @@ class FredService {
     }
     this.lastRequestTime = Date.now();
     
-    const response = await this.fredClient.getSeriesObservations(seriesId, {
-      limit: 10,
-      sortOrder: 'desc',
-      observationStart: '2000-01-01',
-    });
+    const startTime = Date.now();
     
-    return response.fredJson<FredApiResponse>();
+    try {
+      const response = await this.fredClient.getSeriesObservations(seriesId, {
+        limit: 10,
+        sortOrder: 'desc',
+        observationStart: '2000-01-01',
+      });
+      
+      const data = await response.fredJson<FredApiResponse>();
+      const responseTime = Date.now() - startTime;
+      
+      // Record successful API call
+      apiHealthService.recordApiCall('fred', true, responseTime);
+      
+      return data;
+    } catch (error) {
+      const responseTime = Date.now() - startTime;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
+      // Record failed API call
+      apiHealthService.recordApiCall('fred', false, responseTime, errorMessage);
+      
+      throw error;
+    }
   }
 
   private getCachedData(seriesId: string): MetricValue | null {

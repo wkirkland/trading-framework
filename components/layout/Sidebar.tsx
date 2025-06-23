@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { ApiHealthIndicator } from '@/components/monitoring/ApiHealthIndicator';
 
 interface NavItem {
   href: string;
@@ -113,6 +114,11 @@ export default function Sidebar() {
           ))}
         </ul>
       </nav>
+
+      {/* API Health Status */}
+      <div style={{ padding: '0 var(--spacing-4) var(--spacing-2)', borderTop: '1px solid var(--border-subtle)' }}>
+        <ApiHealthIndicator compact={true} />
+      </div>
 
       {/* Theme toggle at bottom */}
       <div className="sidebar-footer">
