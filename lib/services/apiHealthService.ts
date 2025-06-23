@@ -61,6 +61,12 @@ class ApiHealthService {
 
   // Start periodic health checks (every 30 minutes)
   startMonitoring(intervalMs: number = 30 * 60 * 1000) {
+    // Only start monitoring on server side
+    if (typeof window !== 'undefined') {
+      console.warn('API health monitoring can only run on server side');
+      return;
+    }
+    
     if (this.checkInterval) {
       clearInterval(this.checkInterval);
     }
@@ -116,6 +122,11 @@ class ApiHealthService {
     const startTime = Date.now();
     
     try {
+      // Only check FRED API on server side
+      if (typeof window !== 'undefined') {
+        return this.updateApiStatus('fred', 'unknown', null, 'Client-side check not supported');
+      }
+      
       // Use the secure FRED client instead of direct fetch
       const { getFredClient } = await import('@/lib/http/fredClient');
       const fredClient = getFredClient();
@@ -145,6 +156,11 @@ class ApiHealthService {
     const startTime = Date.now();
     
     try {
+      // Only check Alpha Vantage API on server side
+      if (typeof window !== 'undefined') {
+        return this.updateApiStatus('alphaVantage', 'unknown', null, 'Client-side check not supported');
+      }
+      
       // Use the existing secure Alpha Vantage service for health checks
       const { multiSourceDataService } = await import('@/lib/services/multiSourceDataService');
       

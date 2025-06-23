@@ -71,6 +71,11 @@ class FredClient {
   private readonly defaultTimeout: number = 10000; // 10 seconds
 
   constructor() {
+    // Only allow FredClient to be instantiated on server side
+    if (typeof window !== 'undefined') {
+      throw new FredAuthError('FRED API client can only be used on the server side');
+    }
+    
     const env = getCachedEnv();
     
     if (!env.fredApiKey) {
