@@ -252,7 +252,7 @@ class StorageService {
    * Get storage frequency settings for a metric
    */
   private getMetricStorageFrequency(metricName: string) {
-    for (const [frequencyName, config] of Object.entries(this.STORAGE_FREQUENCIES)) {
+    for (const [_frequencyName, config] of Object.entries(this.STORAGE_FREQUENCIES)) {
       if (config.metrics.includes(metricName)) {
         return config;
       }

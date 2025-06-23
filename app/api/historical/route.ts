@@ -1,5 +1,6 @@
 // app/api/historical/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+
 import { getFileStorage } from '@/lib/storage/fileStorage';
 
 interface HistoricalDataPoint {

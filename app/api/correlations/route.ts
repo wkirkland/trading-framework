@@ -1,10 +1,10 @@
 // app/api/correlations/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+
 import { getFileStorage } from '@/lib/storage/fileStorage';
 import { 
   buildCorrelationMatrix, 
   filterCorrelationsByStrength,
-  type CorrelationMatrix,
   type CorrelationData,
   type MetricDataPoint
 } from '@/lib/utils/correlationUtils';

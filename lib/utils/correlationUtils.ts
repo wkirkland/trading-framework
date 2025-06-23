@@ -239,7 +239,6 @@ export function formatCorrelation(correlation: number): string {
  * Get correlation description
  */
 export function getCorrelationDescription(corr: CorrelationData): string {
-  const absCorr = Math.abs(corr.correlation);
   const direction = corr.direction === 'positive' ? 'move together' : 'move opposite';
   const strength = corr.strength.replace('-', ' ');
   

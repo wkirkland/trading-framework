@@ -12,6 +12,7 @@ import {
   ResponsiveContainer,
   ReferenceLine
 } from 'recharts';
+
 import { metricsData } from '@/lib/data/metrics';
 
 interface HistoricalDataPoint {

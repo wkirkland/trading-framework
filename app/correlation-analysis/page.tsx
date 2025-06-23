@@ -2,6 +2,7 @@
 'use client';
 
 import React from 'react';
+
 import { CorrelationMatrix } from '@/components/analytics/CorrelationMatrix';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 
@@ -176,8 +177,8 @@ export default function CorrelationAnalysisPage() {
             🚀 Next: Pattern Recognition
           </h3>
           <p className="text-amber-700 dark:text-amber-300 text-sm">
-            Coming soon: Automated detection of correlation patterns like "risk-off mode" (VIX↑ + Dollar↑ + Stocks↓) 
-            and "growth scare" patterns. Real-time alerts when historical correlation patterns activate.
+            Coming soon: Automated detection of correlation patterns like &quot;risk-off mode&quot; (VIX↑ + Dollar↑ + Stocks↓) 
+            and &quot;growth scare&quot; patterns. Real-time alerts when historical correlation patterns activate.
           </p>
         </div>
       </ErrorBoundary>

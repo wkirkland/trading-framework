@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+
 import { 
   getCorrelationColor, 
   formatCorrelation, 
@@ -219,7 +220,7 @@ export function CorrelationMatrix({
                   <thead>
                     <tr>
                       <th className="w-32"></th>
-                      {matrix.metrics.map((metric, index) => (
+                      {matrix.metrics.map((metric, _index) => (
                         <th 
                           key={metric} 
                           className="p-1 text-xs font-medium text-gray-700 dark:text-gray-300 transform -rotate-45 origin-bottom-left"
@@ -313,7 +314,7 @@ export function CorrelationMatrix({
             </h4>
             {filteredCorrelations.length > 0 ? (
               <div className="space-y-3 max-h-96 overflow-y-auto">
-                {filteredCorrelations.slice(0, 20).map((corr, index) => (
+                {filteredCorrelations.slice(0, 20).map((corr, _index) => (
                   <div 
                     key={`${corr.metric1}-${corr.metric2}`}
                     className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"

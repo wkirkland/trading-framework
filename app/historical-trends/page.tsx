@@ -2,6 +2,7 @@
 'use client';
 
 import React from 'react';
+
 import { HistoricalTrends } from '@/components/analytics/HistoricalTrends';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { metricsData } from '@/lib/data/metrics';
