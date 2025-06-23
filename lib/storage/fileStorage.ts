@@ -302,7 +302,7 @@ class FileStorage {
         lastUpdated: latest.fetchedAt,
         source: latest.source,
         isFallback: latest.isFallback,
-        error: latest.errorMessage
+        error: latest.errorMessage ?? undefined
       };
     } catch (error) {
       console.error('Error getting latest metric data:', error);
@@ -336,7 +336,7 @@ class FileStorage {
             lastUpdated: latest.fetchedAt,
             source: latest.source,
             isFallback: latest.isFallback,
-            error: latest.errorMessage
+            error: latest.errorMessage ?? undefined
           };
         }
       }
