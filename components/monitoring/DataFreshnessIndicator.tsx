@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+
 import { dataFreshnessService, type DataFreshnessStatus } from '@/lib/services/dataFreshnessService';
 import { metricsData } from '@/lib/data/metrics';
 

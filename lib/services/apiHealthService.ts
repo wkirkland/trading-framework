@@ -116,28 +116,22 @@ class ApiHealthService {
     const startTime = Date.now();
     
     try {
-      // Use a lightweight endpoint to check FRED API
-      const response = await fetch(
-        `https://api.stlouisfed.org/fred/series?series_id=GDP&api_key=${process.env.FRED_API_KEY}&file_type=json&limit=1`,
-        { 
-          method: 'GET',
-          signal: AbortSignal.timeout(10000) // 10 second timeout
-        }
-      );
+      // Use the secure FRED client instead of direct fetch
+      const { getFredClient } = await import('@/lib/http/fredClient');
+      const fredClient = getFredClient();
+      
+      const response = await fredClient.getSeriesInfo('GDP');
 
       const responseTime = Date.now() - startTime;
 
-      if (response.ok) {
-        const data = await response.json();
-        
-        // Check if response has expected structure
-        if (data.seriess && Array.isArray(data.seriess)) {
-          return this.updateApiStatus('fred', 'healthy', responseTime);
-        } else {
-          return this.updateApiStatus('fred', 'degraded', responseTime, 'Unexpected response format');
-        }
+      // Use the fredClient's secure JSON parsing
+      const data = await response.fredJson();
+      
+      // Check if response has expected structure
+      if (data.seriess && Array.isArray(data.seriess)) {
+        return this.updateApiStatus('fred', 'healthy', responseTime);
       } else {
-        return this.updateApiStatus('fred', 'down', responseTime, `HTTP ${response.status}: ${response.statusText}`);
+        return this.updateApiStatus('fred', 'degraded', responseTime, 'Unexpected response format');
       }
     } catch (error) {
       const responseTime = Date.now() - startTime;
@@ -151,30 +145,41 @@ class ApiHealthService {
     const startTime = Date.now();
     
     try {
-      // Use a lightweight endpoint to check Alpha Vantage API
-      const response = await fetch(
-        `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=SPY&apikey=${process.env.ALPHA_VANTAGE_API_KEY}`,
-        { 
-          method: 'GET',
-          signal: AbortSignal.timeout(10000) // 10 second timeout
-        }
-      );
+      // Use the existing secure Alpha Vantage service for health checks
+      const { multiSourceDataService } = await import('@/lib/services/multiSourceDataService');
+      
+      // Create a minimal test metric for health check
+      const testMetric = {
+        name: 'S&P 500',
+        category: 'market' as const,
+        description: 'Health check test',
+        priority: 'critical' as const,
+        frequency: 'daily' as const,
+        timing: 'coincident' as const,
+        source: 'Test',
+        impact: 'Test',
+        apiIdentifier: { 
+          alphaVantage: { 
+            function: 'GLOBAL_QUOTE', 
+            symbol: 'SPY' 
+          } 
+        },
+        apiSource: 'AlphaVantage' as const,
+        isPocMetric: true
+      };
+      
+      const result = await multiSourceDataService.fetchAVDataForMetric(testMetric);
 
       const responseTime = Date.now() - startTime;
 
-      if (response.ok) {
-        const data = await response.json();
-        
-        // Check if response has expected structure and no error message
-        if (data['Global Quote'] && !data['Error Message'] && !data['Note']) {
-          return this.updateApiStatus('alphaVantage', 'healthy', responseTime);
-        } else if (data['Note']) {
-          return this.updateApiStatus('alphaVantage', 'degraded', responseTime, 'API rate limit exceeded');
-        } else {
-          return this.updateApiStatus('alphaVantage', 'degraded', responseTime, 'Unexpected response format');
-        }
+      // Check if the result indicates a successful API call
+      if (result.value !== null && result.source === 'Alpha Vantage') {
+        return this.updateApiStatus('alphaVantage', 'healthy', responseTime);
+      } else if (result.source === 'Fallback Data') {
+        // If we got fallback data, the API likely failed
+        return this.updateApiStatus('alphaVantage', 'degraded', responseTime, 'API returned fallback data');
       } else {
-        return this.updateApiStatus('alphaVantage', 'down', responseTime, `HTTP ${response.status}: ${response.statusText}`);
+        return this.updateApiStatus('alphaVantage', 'degraded', responseTime, 'Unexpected response format');
       }
     } catch (error) {
       const responseTime = Date.now() - startTime;
