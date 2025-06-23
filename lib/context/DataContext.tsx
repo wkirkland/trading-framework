@@ -44,11 +44,13 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 // This is the function that React Query will call to fetch data
 async function fetchLiveApiData(): Promise<Record<string, LiveMetricData>> {
   console.log('🔄 TanStack Query: Fetching live API data via fetchLiveApiData()...', new Date().toISOString());
+  console.log('📍 About to fetch from:', window.location.origin + '/api/fred-data');
   
   return fallbackService.withFallback(
     async () => {
       // Fetch from API
       const response = await fetch('/api/fred-data'); // Your API endpoint
+      console.log('📊 Received response:', response.status, response.statusText);
 
       if (!response.ok) {
         // Attempt to get more detailed error from response body if possible
@@ -64,6 +66,11 @@ async function fetchLiveApiData(): Promise<Record<string, LiveMetricData>> {
       }
 
       const result: LiveDataResponse = await response.json();
+      console.log('📦 API result received:', {
+        success: result.success,
+        dataKeys: result.data ? Object.keys(result.data) : 'none',
+        dataCount: result.data ? Object.keys(result.data).length : 0
+      });
 
       if (!result.success || !result.data) {
         const apiErrorMsg = result.error || 'API returned unsuccessful or no data';
