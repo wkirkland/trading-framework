@@ -519,6 +519,31 @@ class FileStorage {
     }
   }
 
+  // Get historical metric data for a specific metric
+  getHistoricalMetricData(metricName: string, limit: number = 100): StoredMetricData[] {
+    try {
+      const metricData = this.readFile<StoredMetricData[]>(METRIC_DATA_FILE, []);
+      return metricData
+        .filter(d => d.metricName === metricName)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, limit);
+    } catch (error) {
+      console.error('Error getting historical metric data:', error);
+      return [];
+    }
+  }
+
+  // Get all historical data (for multiple metrics)
+  getAllHistoricalData(): StoredMetricData[] {
+    try {
+      const metricData = this.readFile<StoredMetricData[]>(METRIC_DATA_FILE, []);
+      return metricData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    } catch (error) {
+      console.error('Error getting all historical data:', error);
+      return [];
+    }
+  }
+
   // Check if storage is available
   isAvailable(): boolean {
     return this.isInitialized;
