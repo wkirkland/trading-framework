@@ -15,7 +15,7 @@ export interface ApiHealthStatus {
 export interface ApiHealthData {
   fred: ApiHealthStatus;
   alphaVantage: ApiHealthStatus;
-  overall: 'healthy' | 'degraded' | 'down';
+  overall: 'healthy' | 'degraded' | 'down' | 'unknown';
   lastUpdated: Date;
 }
 
