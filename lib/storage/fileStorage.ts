@@ -1,20 +1,35 @@
 // lib/storage/fileStorage.ts
 // File-based storage service for local data persistence (SQLite alternative)
 
-import fs from 'fs';
-import path from 'path';
-
 import type { LiveMetricData } from '@/lib/context/DataContext';
 import type { DataFreshnessStatus } from '@/lib/services/dataFreshnessService';
 import { metricsData } from '@/lib/data/metrics';
 
-// Storage directory
-const STORAGE_DIR = path.join(process.cwd(), 'data');
-const METRICS_FILE = path.join(STORAGE_DIR, 'metrics.json');
-const METRIC_DATA_FILE = path.join(STORAGE_DIR, 'metric-data.json');
-const FRESHNESS_FILE = path.join(STORAGE_DIR, 'freshness.json');
-const API_HEALTH_FILE = path.join(STORAGE_DIR, 'api-health.json');
-const CACHE_FILE = path.join(STORAGE_DIR, 'cache.json');
+// Only import fs on server side
+let fs: any;
+let path: any;
+
+if (typeof window === 'undefined') {
+  fs = require('fs');
+  path = require('path');
+}
+
+// Storage directory - will be set when path is available
+let STORAGE_DIR: string;
+let METRICS_FILE: string;
+let METRIC_DATA_FILE: string;
+let FRESHNESS_FILE: string;
+let API_HEALTH_FILE: string;
+let CACHE_FILE: string;
+
+if (typeof window === 'undefined' && path) {
+  STORAGE_DIR = path.join(process.cwd(), 'data');
+  METRICS_FILE = path.join(STORAGE_DIR, 'metrics.json');
+  METRIC_DATA_FILE = path.join(STORAGE_DIR, 'metric-data.json');
+  FRESHNESS_FILE = path.join(STORAGE_DIR, 'freshness.json');
+  API_HEALTH_FILE = path.join(STORAGE_DIR, 'api-health.json');
+  CACHE_FILE = path.join(STORAGE_DIR, 'cache.json');
+}
 
 // Data structures
 interface StoredMetric {
@@ -93,10 +108,16 @@ class FileStorage {
   private readonly maxHistoryPerMetric = 100; // Keep last 100 data points per metric
 
   constructor() {
-    this.initialize();
+    if (typeof window === 'undefined') {
+      this.initialize();
+    }
   }
 
   private initialize() {
+    if (typeof window !== 'undefined' || !fs || !path) {
+      return; // Skip initialization on client side
+    }
+    
     try {
       // Ensure storage directory exists
       if (!fs.existsSync(STORAGE_DIR)) {
@@ -546,7 +567,7 @@ class FileStorage {
 
   // Check if storage is available
   isAvailable(): boolean {
-    return this.isInitialized;
+    return typeof window === 'undefined' && this.isInitialized && fs && path;
   }
 }
 

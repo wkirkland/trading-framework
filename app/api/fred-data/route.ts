@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { fredService } from '@/lib/services/fredService';
 import { multiSourceDataService } from '@/lib/services/multiSourceDataService';
 import { getPocMetrics, Metric as PocMetricConfig } from '@/lib/data/metrics';
+import { getStorageService } from '@/lib/services/storageService';
 
 // Define a consistent structure for the data items in the API response
 interface ApiResponseMetricData {
@@ -257,6 +258,36 @@ export async function GET() {
             fredCache: fredService.getCacheStats(),
             marketCache: multiSourceDataService.getMarketCacheStats()
         };
+    }
+    
+    // Store data in local storage (server-side only)
+    try {
+        const storageService = getStorageService();
+        if (storageService.isAvailable()) {
+            // Convert API response format to LiveMetricData format
+            const metricsForStorage: Record<string, any> = {};
+            for (const [metricName, apiData] of Object.entries(transformedData)) {
+                if (apiData.value !== null) { // Only store non-null values
+                    metricsForStorage[metricName] = {
+                        value: apiData.value,
+                        formatted: apiData.formatted,
+                        date: apiData.date,
+                        change: apiData.change,
+                        lastUpdated: apiData.lastUpdated,
+                        source: apiData.source,
+                        isFallback: false
+                    };
+                }
+            }
+            
+            if (Object.keys(metricsForStorage).length > 0) {
+                await storageService.storeMetricsData(metricsForStorage);
+                console.log(`📦 Stored ${Object.keys(metricsForStorage).length} metrics in local storage`);
+            }
+        }
+    } catch (storageError) {
+        console.error('⚠️ Failed to store data in local storage:', storageError);
+        // Don't fail the API response if storage fails
     }
     
     return NextResponse.json({
