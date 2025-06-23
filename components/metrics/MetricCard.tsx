@@ -139,7 +139,7 @@ export function MetricCard({
       fallbackData={{
         value: data.value,
         change: data.change,
-        lastUpdated: data.lastUpdated
+        lastUpdated: data.lastUpdated || null
       }}
     >
       <div
