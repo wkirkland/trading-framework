@@ -48,16 +48,18 @@ function MetricErrorFallback({
       }}
     >
       {/* Error indicator */}
-      <div style={{
-        position: 'absolute',
-        top: '0.5rem',
-        right: '0.5rem',
-        width: '8px',
-        height: '8px',
-        borderRadius: '50%',
-        backgroundColor: 'var(--status-negative)',
-        title: 'Data unavailable'
-      }} />
+      <div 
+        title="Data unavailable"
+        style={{
+          position: 'absolute',
+          top: '0.5rem',
+          right: '0.5rem',
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          backgroundColor: 'var(--status-negative)'
+        }} 
+      />
 
       <div style={{ textAlign: 'center' as const }}>
         <div style={{ marginBottom: '0.5rem' }}>
