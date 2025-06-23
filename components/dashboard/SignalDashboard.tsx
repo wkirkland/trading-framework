@@ -72,6 +72,7 @@ export default function SignalDashboard() {
     nextUpdate: metric.nextUpdate,
     category: 'economic', // Default category for now
     isLive: metric.value !== null && metric.value !== undefined,
+    lastUpdated: metric.lastUpdated,
     // Generate sample sparkline data (in real implementation, this would come from historical data)
     sparklineData: Array.from({ length: 7 }, () => 
       metric.value !== null ? metric.value + (Math.random() - 0.5) * (metric.value * 0.1) : 0

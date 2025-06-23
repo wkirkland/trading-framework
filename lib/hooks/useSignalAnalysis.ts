@@ -12,6 +12,8 @@ import {
   ThresholdTrigger,
   BasicEvidenceScores
 } from '@/lib/analysis';
+import { dataFreshnessService, type DataFreshnessStatus } from '@/lib/services/dataFreshnessService';
+import { metricsData } from '@/lib/data/metrics';
 
 // Interface for key metrics that matches SignalDashboard expectations
 export interface SignalData {
@@ -22,6 +24,8 @@ export interface SignalData {
   impact: 'high' | 'medium' | 'low';
   change: string;
   nextUpdate: string;
+  lastUpdated: Date | null;
+  freshnessStatus: DataFreshnessStatus;
 }
 
 // Helper function for update frequency estimation
@@ -109,6 +113,19 @@ export function useSignalAnalysis() {
 
         const reasoning = detail.reasoning || `Value: ${detail.currentValue !== null ? detail.currentValue.toFixed(2) : 'N/A'}. ${detail.signal}.`;
 
+        // Calculate data freshness
+        const lastUpdated = liveData?.lastUpdated ? new Date(liveData.lastUpdated) : null;
+        const metricConfig = metricsData.find(m => m.name === detail.name);
+        const frequency = metricConfig?.frequency || 'daily';
+        const isMarketDependent = dataFreshnessService.isMarketDependentMetric(detail.name);
+        
+        const freshnessStatus = dataFreshnessService.calculateFreshness(
+          detail.name,
+          lastUpdated,
+          frequency,
+          isMarketDependent
+        );
+
         return {
           name: detail.name,
           currentSignal,
@@ -117,6 +134,8 @@ export function useSignalAnalysis() {
           impact: detail.weight >= 0.10 ? 'high' : detail.weight >= 0.05 ? 'medium' : 'low',
           change: changeStr,
           nextUpdate: getNextUpdateEstimate(detail.name),
+          lastUpdated,
+          freshnessStatus,
         };
       });
     } catch {

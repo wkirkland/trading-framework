@@ -59,8 +59,8 @@ class ApiHealthService {
     return { ...this.healthData };
   }
 
-  // Start periodic health checks (every 5 minutes)
-  startMonitoring(intervalMs: number = 5 * 60 * 1000) {
+  // Start periodic health checks (every 30 minutes)
+  startMonitoring(intervalMs: number = 30 * 60 * 1000) {
     if (this.checkInterval) {
       clearInterval(this.checkInterval);
     }

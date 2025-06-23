@@ -4,6 +4,7 @@
 import React from 'react'; // Import React if using JSX features like fragments
 
 import type { SignalData } from '@/lib/hooks/useSignalAnalysis'; // Import the type for the metrics data
+import { DataFreshnessIndicator } from '@/components/monitoring/DataFreshnessIndicator';
 
 // Define props for the component
 interface MetricsTableProps {
@@ -58,6 +59,7 @@ export function MetricsTable({ metricsForTable }: MetricsTableProps) {
               <th>Metric Name</th>
               <th>Current Value</th>
               <th>Change</th>
+              <th>Data Freshness</th>
               <th>Thesis Signal</th>
               <th>Reasoning / Matched Rule</th>
               <th>Impact (Weight-Based)</th>
@@ -75,6 +77,14 @@ export function MetricsTable({ metricsForTable }: MetricsTableProps) {
                 </td>
                 <td className={`py-3 px-4 whitespace-nowrap ${metric.change.includes('↑') ? 'text-green-500 dark:text-green-400' : metric.change.includes('↓') ? 'text-red-500 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'}`}>
                   {metric.change}
+                </td>
+                <td className="py-3 px-4 whitespace-nowrap">
+                  <DataFreshnessIndicator
+                    metricName={metric.name}
+                    lastUpdated={metric.lastUpdated}
+                    compact={true}
+                    showTooltip={true}
+                  />
                 </td>
                 <td className={`py-3 px-4 whitespace-nowrap ${getSignalClass(metric.currentSignal)}`}>
                   {metric.currentSignal.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}

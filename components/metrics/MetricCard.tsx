@@ -4,6 +4,7 @@
 import React from 'react';
 
 import { MetricTooltip } from '@/components/ui/Tooltip';
+import { DataFreshnessIndicator } from '@/components/monitoring/DataFreshnessIndicator';
 
 export interface MetricCardData {
   name: string;
@@ -18,6 +19,7 @@ export interface MetricCardData {
   category?: string;
   isLive?: boolean;
   sparklineData?: number[];
+  lastUpdated?: Date | null;
 }
 
 interface MetricCardProps {
@@ -141,12 +143,23 @@ export function MetricCard({
           {category && <div className={`metric-category-badge category-${category}`} />}
         </div>
         
-        {isLive && (
-          <div className="metric-live-indicator">
-            <span className="live-dot"></span>
-            <span className="live-text">Live</span>
-          </div>
-        )}
+        <div className="metric-card-status">
+          {isLive && (
+            <div className="metric-live-indicator">
+              <span className="live-dot"></span>
+              <span className="live-text">Live</span>
+            </div>
+          )}
+          
+          {data.lastUpdated && (
+            <DataFreshnessIndicator
+              metricName={name}
+              lastUpdated={data.lastUpdated}
+              compact={true}
+              showTooltip={true}
+            />
+          )}
+        </div>
       </div>
 
       {/* Main content */}

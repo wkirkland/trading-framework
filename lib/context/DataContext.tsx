@@ -82,10 +82,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   >({
     queryKey: ['liveApiData'] as const, // Unique key for this query. `as const` is good for type inference.
     queryFn: fetchLiveApiData,
-    refetchInterval: 15 * 60 * 1000, // 15 minutes auto-refresh
-    staleTime: 5 * 60 * 1000,        // Data is considered fresh for 5 minutes
-                                     // After 5 mins, it's "stale" and will refetch on next mount/window focus
-                                     // (if not overridden by refetchOnWindowFocus: false etc.)
+    refetchInterval: 60 * 60 * 1000,  // 1 hour auto-refresh (was 15 minutes)
+    staleTime: 30 * 60 * 1000,        // Data is considered fresh for 30 minutes (was 5 minutes)
+                                      // Economic data doesn't need high frequency updates
+    refetchOnWindowFocus: false,      // Don't refetch when window regains focus (too aggressive)
+    refetchOnMount: true,             // Refetch when component mounts
     // placeholderData: {}, // Optional: provide some initial data (e.g. empty object)
     // keepPreviousData: true, // Optional: useful for UX to show old data while new is fetching
     retry: 2, // Optional: retry failed queries 2 times
