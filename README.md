@@ -47,6 +47,9 @@ The system continuously monitors 20+ key economic indicators including GDP growt
 - **Metric detail tables** with reasoning and data sources
 
 ### ⚡ Advanced Analytics
+- **Historical Trends Visualization**: Time-series charts with Recharts for trend analysis
+- **Correlation Analysis**: Heat map visualization of metric relationships with Pearson correlation
+- **Pattern Recognition**: Ready for automated detection of correlation patterns
 - **Configurable scoring rules** for different economic scenarios
 - **Automated signal classification** (confirm/contradict/neutral)
 - **Market stress and recession triggers**
@@ -217,10 +220,13 @@ npm run lint
 
 ### Accessing the Dashboard
 
-1. **Main Dashboard**: Navigate to `/signal-dashboard` for the primary trading interface
-2. **Alternative Views**: 
+1. **Main Dashboard**: Navigate to `/module1` for the primary trading interface
+2. **Analytics Views**: 
+   - `/signal-dashboard` - Signal analysis and conflict detection
    - `/enhanced-dashboard` - Enhanced analytics view
-   - `/module1` - Additional analysis modules
+   - `/historical-trends` - Time-series visualization and trend analysis
+   - `/correlation-analysis` - Metric correlation heat maps and analysis
+   - `/storage-viewer` - Database inspection and cache statistics
 
 ### Core Workflows
 
@@ -315,6 +321,29 @@ Main trading interface featuring:
 - Comprehensive metrics table
 
 ## API Integration
+
+### Current API Endpoints
+
+#### Economic Data Endpoint (`/api/fred-data`)
+**Purpose**: Real-time economic data from FRED and Alpha Vantage APIs
+
+#### Historical Data Endpoint (`/api/historical`)
+**Purpose**: Time-series data for trend analysis and charts
+```bash
+GET /api/historical?metric=Fed+Funds+Rate&days=90&limit=100
+```
+
+#### Correlation Analysis Endpoint (`/api/correlation`)
+**Purpose**: Calculate correlations between economic metrics
+```bash
+GET /api/correlation?days=90&minStrength=moderate&limit=50
+```
+
+#### Storage System Endpoint (`/api/storage`)
+**Purpose**: Database inspection and cache statistics
+```bash
+GET /api/storage?section=all
+```
 
 ### Economic Data Endpoint (`/api/fred-data`)
 
