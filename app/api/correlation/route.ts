@@ -88,17 +88,19 @@ export async function GET(request: NextRequest) {
             .filter(item => new Date(item.createdAt) >= cutoffDate)
             .map(item => ({
               date: item.date,
-              value: item.value
+              value: item.value as number,
+              timestamp: new Date(item.date).getTime()
             }))
-            .filter(item => item.value !== null);
+            .filter(item => item.value !== null && !isNaN(item.value));
 
           const data2 = fileStorage.getHistoricalMetricData(metric2.name, 1000)
             .filter(item => new Date(item.createdAt) >= cutoffDate)
             .map(item => ({
               date: item.date,
-              value: item.value
+              value: item.value as number,
+              timestamp: new Date(item.date).getTime()
             }))
-            .filter(item => item.value !== null);
+            .filter(item => item.value !== null && !isNaN(item.value));
 
           if (data1.length < 5 || data2.length < 5) {
             continue; // Need at least 5 data points for meaningful correlation
